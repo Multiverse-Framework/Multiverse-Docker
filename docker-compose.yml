@@ -1,0 +1,52 @@
+version: '3.4'
+
+networks:
+  ros-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${SUBNET}
+
+services:
+  ros-core-service:
+    tty: true
+    image: multiverse:demos
+    build:
+      context: ./images/Multiverse-image/
+      dockerfile: Dockerfile
+      args:
+        ROS_DISTRO: ${ROS_DISTRO}
+    container_name: ros-core-container
+    hostname: ros-core
+    networks:
+      ros-network:
+        ipv4_address: ${ROS_IP_CORE}
+    environment:
+      - ROS_MASTER_URI=http://${ROS_IP_CORE}:11311
+      - ROS_IP=${ROS_IP_CORE}
+    entrypoint: /entrypoint.bash
+    command: roscore
+
+  multiverse-service:
+    tty: true
+    image: multiverse/Multiverse:demos
+    container_name: multiverse-container
+    hostname: multiverse
+    networks:
+      ros-network:
+        ipv4_address: ${ROS_IP_CORE}
+    environment:
+      - DISPLAY
+      - QT_X11_NO_MITSHM=1 #fix some QT bugs
+      - HOST_IP=${HOST_IP}
+      - ROS_MASTER_URI=http://${ROS_IP_CORE}:11311
+      - ROS_IP=${ROS_IP_CORE}
+      - PXR_PLUGINPATH_NAME=/home/USD/build_scripts/install/share/usd/examples/plugin/usdOntology/resources/
+      - PYTHONPATH=/home/USD/build_scripts/install/lib/python
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ./images/multiverse-image/src:/home/mujoco_ws/src:rw
+    entrypoint: /entrypoint.bash
+    command: sh -c "roslaunch mujoco_sim mujoco_sim.launch"
+    depends_on:
+      - ros-core-service
