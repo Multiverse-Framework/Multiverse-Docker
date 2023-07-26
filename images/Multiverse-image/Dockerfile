@@ -21,7 +21,8 @@ RUN apt-get update && apt install -y \
   ros-${ROS_DISTRO}-effort-controllers \
   ros-${ROS_DISTRO}-gripper-action-controller \
   ros-${ROS_DISTRO}-move-base \
-  ros-${ROS_DISTRO}-map-server
+  ros-${ROS_DISTRO}-map-server \
+  ros-${ROS_DISTRO}-dwa-local-planner
 
 RUN apt install -y \
   python3-pip \
