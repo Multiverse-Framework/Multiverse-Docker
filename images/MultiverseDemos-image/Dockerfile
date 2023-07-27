@@ -5,10 +5,10 @@ FROM multiverseframework/multiverse:latest
 ARG DEBIAN_FRONTEND=noninteractive 
 
 # Copy packages
-COPY multiverse_objects /home/Multiverse/multiverse/src/multiverse_objects
-COPY multiverse_robots /home/Multiverse/multiverse/src/multiverse_robots
-COPY multiverse_world /home/Multiverse/multiverse/src/multiverse_world
-COPY multiverse_demos /home/Multiverse/multiverse/src/multiverse_demos
+COPY multiverse_objects /home/Multiverse/multiverse_ws/src/multiverse_objects
+COPY multiverse_robots /home/Multiverse/multiverse_ws/src/multiverse_robots
+COPY multiverse_world /home/Multiverse/multiverse_ws/src/multiverse_world
+COPY multiverse_demos /home/Multiverse/multiverse_ws/src/multiverse_demos
 
 # Install prerequisites
 RUN apt-get update && apt install -y \

@@ -10,7 +10,7 @@ networks:
 services:
   ros-core-service:
     tty: true
-    image: multiverseframework/multiverse:latest
+    image: multiverseframework/multiverse:${ROS_DISTRO}
     build:
       context: ./images/Multiverse-image/
       dockerfile: Dockerfile
@@ -29,7 +29,7 @@ services:
 
   multiverse-server-service:
     tty: true
-    image: multiverseframework/multiverse:latest
+    image: multiverseframework/multiverse:${ROS_DISTRO}
     container_name: multiverse-server-container
     hostname: multiverse-server
     networks:
@@ -47,9 +47,9 @@ services:
 
   multiverse-client-mujoco-service:
     tty: true
-    image: multiverseframework/multiverse-demos:latest
+    image: multiverseframework/multiverse-demos:${ROS_DISTRO}
     build:
-      context: ./images/MultiverseDemo-image/
+      context: ./images/MultiverseDemos-image/
       dockerfile: Dockerfile
       args:
         ROS_DISTRO: ${ROS_DISTRO}
@@ -59,22 +59,18 @@ services:
       ros-network:
         ipv4_address: ${ROS_IP_MULTIVERSE_CLIENT_MUJOCO}
     environment:
-      - DISPLAY
-      - QT_X11_NO_MITSHM=1 #fix some QT bugs
-      - HOST_IP=${HOST_IP}
       - ROS_MASTER_URI=http://ros-core:11311
       - ROS_IP=${ROS_IP_MULTIVERSE_CLIENT_MUJOCO}
     volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ./images/MultiverseDemos-image/multiverse_demos:/home/Multiverse/multiverse_ws/src/multiverse_demos:rw
     entrypoint: /entrypoint.bash
-    command: sh -c "roslaunch tiago_dual_in_apartment mujoco.launch"
+    command: sh -c "roslaunch tiago_dual_in_apartment mujoco.launch headless:=true"
     depends_on:
       - multiverse-server-service
 
   multiverse-client-ros-service:
     tty: true
-    image: multiverseframework/multiverse-demos:latest
+    image: multiverseframework/multiverse-demos:${ROS_DISTRO}
     container_name: multiverse-client-ros-container
     hostname: multiverse-client-ros
     networks:
@@ -88,6 +84,9 @@ services:
       - ROS_IP=${ROS_IP_MULTIVERSE_CLIENT_ROS}
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ./images/MultiverseDemos-image/multiverse_objects:/home/Multiverse/multiverse_ws/src/multiverse_objects:rw
+      - ./images/MultiverseDemos-image/multiverse_robots:/home/Multiverse/multiverse_ws/src/multiverse_robots:rw
+      - ./images/MultiverseDemos-image/multiverse_world:/home/Multiverse/multiverse_ws/src/multiverse_world:rw
       - ./images/MultiverseDemos-image/multiverse_demos:/home/Multiverse/multiverse_ws/src/multiverse_demos:rw
     entrypoint: /entrypoint.bash
     command: sh -c "roslaunch tiago_dual_in_apartment multiverse_client.launch"
@@ -117,4 +116,27 @@ services:
     entrypoint: /entrypoint.bash
     command: sh -c "sleep 1 && roslaunch tiago_dual_control tiago_dual_giskard.launch"
     depends_on:
+      - multiverse-client-mujoco-service
       - multiverse-client-ros-service
+
+  rviz-service:
+    tty: true
+    image: giskard:${ROS_DISTRO}
+    container_name: rviz-container
+    hostname: rviz
+    networks:
+      ros-network:
+        ipv4_address: ${ROS_IP_RVIZ}
+    environment:
+      - DISPLAY
+      - QT_X11_NO_MITSHM=1 #fix some QT bugs
+      - HOST_IP=${HOST_IP}
+      - ROS_MASTER_URI=http://ros-core:11311
+      - ROS_IP=${ROS_IP_RVIZ}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    entrypoint: /entrypoint.bash
+    command: sh -c "roslaunch tiago_dual_in_apartment rviz.launch"
+    depends_on:
+      - multiverse-client-ros-service
+      - giskard-service
