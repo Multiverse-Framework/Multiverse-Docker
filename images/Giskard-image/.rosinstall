@@ -1,0 +1,8 @@
+- git:
+    local-name: giskardpy
+    uri: https://github.com/Multiverse-Framework/giskardpy.git
+    version: devel
+- git: 
+    local-name: giskard_msgs
+    uri: https://github.com/SemRoCo/giskard_msgs.git
+    version: v0.5.1

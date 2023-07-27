@@ -5,26 +5,14 @@ FROM ros:${ROS_DISTRO}-ros-core
 ARG DEBIAN_FRONTEND=noninteractive 
 
 # Copy packages
-COPY Multiverse /home/Multiverse
+COPY Multiverse/build.sh /home/Multiverse/build.sh
+COPY Multiverse/src /home/Multiverse/src
+COPY Multiverse/multiverse_ws/src/multiverse_connectors /home/Multiverse/multiverse_ws/src/multiverse_connectors
+COPY Multiverse/multiverse_ws/src/multiverse_core /home/Multiverse/multiverse_ws/src/multiverse_core
 WORKDIR /home/Multiverse
 
 # Install prerequisites
 RUN apt-get update && apt install -y \
-  ros-${ROS_DISTRO}-xacro \
-  ros-${ROS_DISTRO}-rviz \
-  ros-${ROS_DISTRO}-controller-manager \
-  ros-${ROS_DISTRO}-joint-trajectory-controller \
-  ros-${ROS_DISTRO}-rqt-robot-steering \
-  ros-${ROS_DISTRO}-rqt-joint-trajectory-controller \
-  ros-${ROS_DISTRO}-joint-state-controller \
-  ros-${ROS_DISTRO}-joint-state-publisher-gui \
-  ros-${ROS_DISTRO}-effort-controllers \
-  ros-${ROS_DISTRO}-gripper-action-controller \
-  ros-${ROS_DISTRO}-move-base \
-  ros-${ROS_DISTRO}-map-server \
-  ros-${ROS_DISTRO}-dwa-local-planner
-
-RUN apt install -y \
   python3-pip \
   python3.8-dev \
   python3-catkin-tools \

@@ -10,7 +10,7 @@ networks:
 services:
   ros-core-service:
     tty: true
-    image: multiverseframework/multiverse:demos
+    image: multiverseframework/multiverse:latest
     build:
       context: ./images/Multiverse-image/
       dockerfile: Dockerfile
@@ -29,7 +29,7 @@ services:
 
   multiverse-server-service:
     tty: true
-    image: multiverseframework/multiverse:demos
+    image: multiverseframework/multiverse:latest
     container_name: multiverse-server-container
     hostname: multiverse-server
     networks:
@@ -47,7 +47,12 @@ services:
 
   multiverse-client-mujoco-service:
     tty: true
-    image: multiverseframework/multiverse:demos
+    image: multiverseframework/multiverse-demos:latest
+    build:
+      context: ./images/MultiverseDemo-image/
+      dockerfile: Dockerfile
+      args:
+        ROS_DISTRO: ${ROS_DISTRO}
     container_name: multiverse-client-mujoco-container
     hostname: multiverse-client-mujoco
     networks:
@@ -61,15 +66,15 @@ services:
       - ROS_IP=${ROS_IP_MULTIVERSE_CLIENT_MUJOCO}
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - ./images/Multiverse-image/Multiverse/multiverse_ws/src/multiverse_demos:/home/Multiverse/multiverse_ws/src/multiverse_demos:rw
+      - ./images/MultiverseDemos-image/multiverse_demos:/home/Multiverse/multiverse_ws/src/multiverse_demos:rw
     entrypoint: /entrypoint.bash
     command: sh -c "roslaunch tiago_dual_in_apartment mujoco.launch"
     depends_on:
-      - ros-core-service
+      - multiverse-server-service
 
   multiverse-client-ros-service:
     tty: true
-    image: multiverseframework/multiverse:demos
+    image: multiverseframework/multiverse-demos:latest
     container_name: multiverse-client-ros-container
     hostname: multiverse-client-ros
     networks:
@@ -83,8 +88,33 @@ services:
       - ROS_IP=${ROS_IP_MULTIVERSE_CLIENT_ROS}
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - ./images/Multiverse-image/Multiverse/multiverse_ws/src/multiverse_demos:/home/Multiverse/multiverse_ws/src/multiverse_demos:rw
+      - ./images/MultiverseDemos-image/multiverse_demos:/home/Multiverse/multiverse_ws/src/multiverse_demos:rw
     entrypoint: /entrypoint.bash
     command: sh -c "roslaunch tiago_dual_in_apartment multiverse_client.launch"
     depends_on:
-      - ros-core-service
+      - multiverse-server-service
+
+  giskard-service:
+    tty: true
+    image: giskard:${ROS_DISTRO}
+    build:
+      context: ./images/Giskard-image/
+      dockerfile: Dockerfile
+      args:
+        ROS_DISTRO: ${ROS_DISTRO}
+    container_name: giskard-container
+    hostname: giskard
+    networks:
+      ros-network:
+        ipv4_address: ${ROS_IP_GISKARD}
+    environment:
+      - HOST_IP=${HOST_IP}
+      - ROS_MASTER_URI=http://ros-core:11311
+      - ROS_IP=${ROS_IP_GISKARD}
+    volumes:
+      - ./images/Giskard-image/giskard_msgs:/home/Multiverse/giskard_ws/src/giskard_msgs:rw
+      - ./images/Giskard-image/giskardpy:/home/Multiverse/giskard_ws/src/giskardpy:rw
+    entrypoint: /entrypoint.bash
+    command: sh -c "sleep 1 && roslaunch tiago_dual_control tiago_dual_giskard.launch"
+    depends_on:
+      - multiverse-client-ros-service
