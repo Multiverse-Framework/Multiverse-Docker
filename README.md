@@ -12,6 +12,8 @@ sudo ./setup_nvidia_docker.bash
 ```bash
 docker compose up ros-core-service
 docker compose up multiverse-server-service
-./run_multiverse_client_mujoco.bash
-./run_multiverse_client_ros.bash
+docker compose up multiverse-client-mujoco-service
+docker compose up multiverse-client-ros-service
+docker compose up giskard-service
+./run_rviz.bash
 ```
