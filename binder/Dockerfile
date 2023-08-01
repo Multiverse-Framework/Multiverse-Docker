@@ -61,5 +61,5 @@ RUN python3 ${REPO_DIR}/binder/compress_textures.py \
     --max_size=512
 
 USER ${NB_USER}
-WORKDIR ${HOME}
+WORKDIR /home
 ENTRYPOINT ["/home/jovyan/.local/entrypoint.sh"]
