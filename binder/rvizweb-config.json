@@ -1,0 +1,84 @@
+{
+  "globalOptions": {
+    "background": "#d4e9f5",
+    "fixedFrame": "/map",
+    "url": "ws://localhost:8888/proxy/9090",
+    "colladaServer": "http://localhost:8888/proxy/8001",
+    "videoServer": "http://localhost:8888/proxy/9999"
+  },
+  "viewerOptions": {
+    "camera": {
+      "position": {
+        "x": 30,
+        "y": 2.5,
+        "z": 10
+      }
+    },
+    "cameraControls": {
+      "center": {
+        "x": 10,
+        "y": 2.5,
+        "z": 0
+      }
+    },
+    "directionalLight": {
+      "position": {
+        "x": 10,
+        "y": 2.5,
+        "z": 3
+      }
+    }
+  },
+  "sidebarOpened": false,
+  "displays": [
+    {
+      "isShown": true,
+      "name": "Grid",
+      "options": {
+        "cellSize": "1",
+        "color": "#ff357f",
+        "numCells": "50"
+      },
+      "type": "grid"
+    },
+    {
+      "isShown": true,
+      "name": "Map",
+      "options": {
+        "color": {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        },
+        "continuous": true,
+        "opacity": "0.7",
+        "topic": "/move_base/global_costmap/costmap"
+      },
+      "type": "occupancyGrid"
+    },
+    {
+      "isShown": true,
+      "name": "TF",
+      "options": {},
+      "type": "tf"
+    },
+    {
+      "isShown": true,
+      "name": "Apartment model",
+      "options": {
+        "param": "apartment_description",
+        "tfPrefix": ""
+      },
+      "type": "urdf"
+    },
+    {
+      "isShown": true,
+      "name": "Tiago model",
+      "options": {
+        "param": "robot_description",
+        "tfPrefix": ""
+      },
+      "type": "urdf"
+    }
+  ]
+}
