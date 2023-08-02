@@ -25,8 +25,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - &&\
 WORKDIR /home/Multiverse/giskard_ws
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws/logs && \
     chown -R ${NB_UID} /home/Multiverse/multiverse_ws/src && \
-    chown -R ${NB_UID} /home/Multiverse/giskard_ws && \
-    ln -s  /home/Multiverse/giskard_ws /home/jovyan/giskard_ws
+    chown -R ${NB_UID} /home/Multiverse/giskard_ws
 
 RUN pip install pip --upgrade
 # Install jupyterlab and related packages
@@ -52,7 +51,6 @@ USER ${NB_USER}
 RUN catkin build
 
 COPY --chown=${NB_USER}:users . ${REPO_DIR}
-COPY --chown=${NB_USER}:users ./binder/multiverse_params.yaml /home/Multiverse/multiverse_ws/src/multiverse_core/multiverse_server/config/
 COPY --chown=${NB_USER}:users ./binder/entrypoint.sh /home/${NB_USER}/.local/
 
 # Compress IAI apartment 3d model texture
@@ -61,5 +59,5 @@ RUN python3 ${REPO_DIR}/binder/compress_textures.py \
     --max_size=512
 
 USER ${NB_USER}
-WORKDIR /home
+WORKDIR /home/Multiverse
 ENTRYPOINT ["/home/jovyan/.local/entrypoint.sh"]
