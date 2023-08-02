@@ -5,6 +5,7 @@
 ```bash
 sudo ./setup_nvidia_docker.bash
 ./setup_images.bash
+docker compose pull
 ```
 
 2. Run the cluster.
