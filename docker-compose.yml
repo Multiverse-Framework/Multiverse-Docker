@@ -114,7 +114,7 @@ services:
       - ./images/Giskard-image/giskard_msgs:/home/Multiverse/giskard_ws/src/giskard_msgs:rw
       - ./images/Giskard-image/giskardpy:/home/Multiverse/giskard_ws/src/giskardpy:rw
     entrypoint: /entrypoint.bash
-    command: sh -c "sleep 1 && roslaunch tiago_dual_control tiago_dual_giskard.launch"
+    command: sh -c "roslaunch tiago_dual_control tiago_dual_giskard.launch"
     depends_on:
       - multiverse-client-mujoco-service
       - multiverse-client-ros-service
