@@ -41,7 +41,7 @@ services:
     volumes:
       - ./images/Multiverse-image/Multiverse/multiverse_ws/src/multiverse_core/multiverse_server:/home/Multiverse/multiverse_ws/src/multiverse_core/multiverse_server:rw
     entrypoint: /entrypoint.bash
-    command: sh -c "roslaunch multiverse_server multiverse_server.launch"
+    command: sh -c "roslaunch multiverse_server multiverse_server.launch server_socket_host:=tcp://${ROS_IP_MULTIVERSE_SERVER}"
     depends_on:
       - ros-core-service
 
