@@ -67,7 +67,7 @@ services:
       - ./images/MultiverseDemos-image/multiverse_world:/home/Multiverse/multiverse_ws/src/multiverse_world:rw
       - ./images/MultiverseDemos-image/multiverse_demos:/home/Multiverse/multiverse_ws/src/multiverse_demos:rw
     entrypoint: /entrypoint.bash
-    command: sh -c "roslaunch tiago_dual_in_apartment mujoco.launch headless:=true"
+    command: sh -c "roslaunch ur5e_with_task_board mujoco.launch headless:=true"
     depends_on:
       - multiverse-server-service
 
@@ -89,35 +89,9 @@ services:
       - ./images/MultiverseDemos-image/multiverse_world:/home/Multiverse/multiverse_ws/src/multiverse_world:rw
       - ./images/MultiverseDemos-image/multiverse_demos:/home/Multiverse/multiverse_ws/src/multiverse_demos:rw
     entrypoint: /entrypoint.bash
-    command: sh -c "roslaunch tiago_dual_in_apartment multiverse_client.launch"
+    command: sh -c "roslaunch ur5e_with_task_board multiverse_client.launch"
     depends_on:
       - multiverse-server-service
-
-  giskard-service:
-    tty: true
-    image: multiverseframework/giskard:${ROS_DISTRO}
-    build:
-      context: ./images/Giskard-image/
-      dockerfile: Dockerfile
-      args:
-        ROS_DISTRO: ${ROS_DISTRO}
-    container_name: giskard-container
-    hostname: giskard
-    networks:
-      ros-network:
-        ipv4_address: ${ROS_IP_GISKARD}
-    environment:
-      - HOST_IP=${HOST_IP}
-      - ROS_MASTER_URI=http://ros-core:11311
-      - ROS_IP=${ROS_IP_GISKARD}
-    volumes:
-      - ./images/Giskard-image/giskard_msgs:/home/Multiverse/giskard_ws/src/giskard_msgs:rw
-      - ./images/Giskard-image/giskardpy:/home/Multiverse/giskard_ws/src/giskardpy:rw
-    entrypoint: /entrypoint.bash
-    command: sh -c "roslaunch tiago_dual_control tiago_dual_giskard.launch"
-    depends_on:
-      - multiverse-client-mujoco-service
-      - multiverse-client-ros-service
 
   rviz-service:
     tty: true
@@ -142,7 +116,6 @@ services:
       - ./images/MultiverseDemos-image/multiverse_world:/home/Multiverse/multiverse_ws/src/multiverse_world:rw
       - ./images/MultiverseDemos-image/multiverse_demos:/home/Multiverse/multiverse_ws/src/multiverse_demos:rw
     entrypoint: /entrypoint.bash
-    command: sh -c "roslaunch tiago_dual_in_apartment rviz.launch"
+    command: sh -c "roslaunch ur5e_with_task_board rviz.launch"
     depends_on:
       - multiverse-client-ros-service
-      - giskard-service
