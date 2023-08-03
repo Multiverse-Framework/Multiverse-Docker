@@ -18,3 +18,10 @@ docker compose up multiverse-client-ros-service
 docker compose up giskard-service
 ./run_rviz.bash
 ```
+
+3. Connect to docker container via ROS
+
+```bash
+export ROS_MASTER_URI=http://192.168.75.2:11311
+export ROS_IP=$(hostname -I | awk '{print $1}') #your IP
+```
