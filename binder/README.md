@@ -16,7 +16,7 @@ Files for running IROS demo in a single docker container on BinderHub.
   docker build ./ -f ./binder/Dockerfile -t multiversedocker:binderhub
 
 ### Option 2: Run on BinderHub
-- [Link to the binderhub](https://binder.intel4coro.de/v2/gh/yxzhan/Multiverse-Docker.git/main)
+- [Link to the binderhub](https://jupyter.intel4coro.de/user/multiverse-fram-ltiverse-docker-5jkfl85c/lab)
 
 
 ## Usage
