@@ -53,11 +53,6 @@ RUN catkin build
 COPY --chown=${NB_USER}:users . ${REPO_DIR}
 COPY --chown=${NB_USER}:users ./binder/entrypoint.sh /home/${NB_USER}/.local/
 
-# Compress IAI apartment 3d model texture
-RUN python3 ${REPO_DIR}/binder/compress_textures.py \
-    --img_path=/home/Multiverse/multiverse_ws/src/multiverse_world/iai_apartment\
-    --max_size=512
-
 USER ${NB_USER}
 WORKDIR /home/Multiverse
 ENTRYPOINT ["/home/jovyan/.local/entrypoint.sh"]
