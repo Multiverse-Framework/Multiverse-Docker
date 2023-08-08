@@ -1,13 +1,11 @@
 FROM multiverseframework/giskard:noetic
 
-ARG ROS_DISTRO=noetic
-ENV REPO_DIR=/home/jovyan/repo
 USER root
+ENV SHELL=/bin/bash
 
 # Create non-root user jovyan
-ENV SHELL=/bin/bash
-ARG NB_USER=jovyan
-ARG NB_UID=1000
+ENV NB_USER=jovyan
+ENV NB_UID=1000
 ENV USER ${NB_USER}
 ENV NB_UID ${NB_UID}
 ENV HOME /home/${NB_USER}
@@ -17,42 +15,56 @@ RUN adduser --disabled-password \
     ${NB_USER}
 
 # Install apt packages
-RUN apt-get update && apt-get install -y curl vim xvfb htop ros-${ROS_DISTRO}-tf2-tools
+RUN apt-get update && apt-get install -y curl vim xvfb htop ros-noetic-tf2-tools
+# Install nodejs (dependency of Jupyterlab extensions)
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - &&\
     apt-get install -y nodejs
 
-# Allow user jovyan write some directories
+# Install jupyterlab and related python packages
+RUN pip install pip --upgrade
+RUN pip install --no-cache-dir notebook==6.4.12 jupyterlab==3.6.5 \
+        wstool pyOpenSSL==23.2.0 pyyaml==5.3.1 cryptography==38.0.4 \
+        jupyter-resource-usage jupyter-offlinenotebook \
+        jupyter-server-proxy jupyterlab-git jlab-enhanced-cell-toolbar \
+        autobahn gnupg twisted cbor2 empy ipywidgets  \
+        pymongo Pillow pycryptodomex simplejpeg tqdm \
+        https://raw.githubusercontent.com/yxzhan/jupyterlab-rviz/master/release/jupyterlab_rviz-0.2.5.tar.gz
+
+# Allow user ${NB_USER} write some directories
 WORKDIR /home/Multiverse/giskard_ws
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws/logs && \
     chown -R ${NB_UID} /home/Multiverse/multiverse_ws/src && \
     chown -R ${NB_UID} /home/Multiverse/giskard_ws
 
-RUN pip install pip --upgrade
-# Install jupyterlab and related packages
-RUN pip install --no-cache-dir notebook==6.4.12 jupyterlab==3.6.5 \
-        pyOpenSSL==23.2.0 pyyaml==5.3.1 cryptography==38.0.4 \
-        jupyter-resource-usage jupyter-offlinenotebook \
-        jupyter-server-proxy jupyterlab-git jlab-enhanced-cell-toolbar \
-        autobahn gnupg twisted cbor2 empy ipywidgets  \
-        pymongo Pillow pycryptodomex simplejpeg \
-        https://raw.githubusercontent.com/yxzhan/jupyterlab-rviz/master/release/jupyterlab_rviz-0.2.4.tar.gz
+# Copy necessary files
+COPY --chown=${NB_USER}:users binder /home/binder
+COPY --chown=${NB_USER}:users binder/iros.jupyterlab-workspace /home/Multiverse/
+# Fix the mesh obj url in marker array
+COPY --chown=${NB_USER}:users binder/me /home/Multiverse/giskard_ws/src/me
 
+# Compress IAI apartment 3d model texture
+RUN python3 /home/binder/compress_textures.py \
+    --img_path=/home/Multiverse/multiverse_ws/src/multiverse_world/iai_apartment\
+    --max_size=512
 
-# Install Rvizweb and ROSBoard
+# Install ROS web tools under workspace giskard_ws
 USER ${NB_USER}
-RUN git clone https://github.com/yxzhan/rvizweb.git src/rvizweb -b master
-RUN git clone https://github.com/yxzhan/rosboard.git src/rosboard -b main
-COPY --chown=${NB_USER}:users ./binder/app.json src/rvizweb/webapps/
+WORKDIR /home/Multiverse/giskard_ws/src
+RUN wstool init && \
+    wstool merge https://raw.githubusercontent.com/yxzhan/rvizweb/master/.rosinstall && \
+    wstool update
 RUN rosdep update
 USER root
-RUN rosdep install -y --ignore-src --from-paths ./ -r
-RUN chown -R ${NB_UID} /home/jovyan
+RUN apt update && rosdep install -y --ignore-src --from-paths ./ -r
+RUN chown -R ${NB_UID} /home/${NB_USER}
 USER ${NB_USER}
 RUN catkin build
 
-COPY --chown=${NB_USER}:users . ${REPO_DIR}
-COPY --chown=${NB_USER}:users ./binder/entrypoint.sh /home/${NB_USER}/.local/
+# Install OH-My-Bash
+RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)" && \
+    sed -i 's/OSH_THEME="font"/OSH_THEME="cupcake"/' /home/${NB_USER}/.bashrc
+COPY --chown=${NB_USER}:users binder/jupyter-settings.json /usr/local/share/jupyter/lab/settings/overrides.json
 
 USER ${NB_USER}
 WORKDIR /home/Multiverse
-ENTRYPOINT ["/home/jovyan/.local/entrypoint.sh"]
+ENTRYPOINT ["/home/binder/entrypoint.sh"]
