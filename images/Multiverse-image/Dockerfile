@@ -6,6 +6,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 # Copy packages
 COPY Multiverse/build.sh /home/Multiverse/build.sh
+COPY Multiverse/build_ws.sh /home/Multiverse/build_ws.sh
 COPY Multiverse/src /home/Multiverse/src
 COPY Multiverse/multiverse_ws/src/multiverse_connectors /home/Multiverse/multiverse_ws/src/multiverse_connectors
 COPY Multiverse/multiverse_ws/src/multiverse_core /home/Multiverse/multiverse_ws/src/multiverse_core
@@ -25,20 +26,39 @@ RUN apt-get update && apt install -y \
   libxt-dev \
   git \
   libjsoncpp-dev \
-  libzmqpp-dev
+  libzmqpp-dev \
+  build-essential \
+  software-properties-common \
+  subversion \
+  cmake \
+  libx11-dev \
+  libxxf86vm-dev \
+  libxcursor-dev \
+  libxi-dev \
+  libxrandr-dev \
+  libxinerama-dev \
+  libegl-dev \
+  libwayland-dev \
+  wayland-protocols \
+  libxkbcommon-dev \
+  libdbus-1-dev \
+  linux-libc-dev
+
+# Install and link gcc-11
+RUN add-apt-repository ppa:ubuntu-toolchain-r/test && apt install -y gcc-11 && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 1
 
 RUN pip3 install \
   pyside6 \
   pyopengl \
-  mujoco-py \
   wheel \
   cython \
   owlready2 \
   jinja2 \
-  numpy-stl \
   pybind11
 
 RUN ./build.sh
+
+RUN ./build_ws.sh
 
 # Create entrypoint
 SHELL ["/bin/bash", "-c"]
