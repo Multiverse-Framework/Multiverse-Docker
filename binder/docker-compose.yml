@@ -7,11 +7,11 @@ services:
       dockerfile: ./binder/Dockerfile
     tty: true
     stdin_open: true
-    entrypoint: ["/home/jovyan/repo/binder/entrypoint.sh"]
+    entrypoint:  ["/home/binder/entrypoint.sh"]
     command: jupyter lab --allow-root --NotebookApp.token='' --no-browser --ip=0.0.0.0
     # command: xvfb-run jupyter lab --allow-root --NotebookApp.token='' --no-browser --ip=0.0.0.0
     # user: root
-    working_dir: /home
+    # working_dir: /home
     ports:
       - 8888:8888
     environment:
@@ -19,4 +19,11 @@ services:
       - QT_X11_NO_MITSHM=1
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - ../:/home/jovyan/repo
+      - ./:/home/binder
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

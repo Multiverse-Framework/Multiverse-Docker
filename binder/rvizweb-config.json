@@ -56,12 +56,6 @@
     },
     {
       "isShown": true,
-      "name": "TF",
-      "options": {},
-      "type": "tf"
-    },
-    {
-      "isShown": true,
       "name": "Apartment model",
       "options": {
         "param": "apartment_description",
@@ -71,12 +65,28 @@
     },
     {
       "isShown": true,
+      "name": "Ghost",
+      "options": {
+        "topic": "/giskard/visualization_marker_array"
+      },
+      "type": "markerArray"
+    },
+    {
+      "isShown": true,
       "name": "Tiago model",
       "options": {
         "param": "robot_description",
         "tfPrefix": ""
       },
       "type": "urdf"
+    },
+    {
+      "isShown": true,
+      "name": "Interactive Markers",
+      "options": {
+        "topic": "/eef_control"
+      },
+      "type": "interactiveMarkers"
     }
   ]
 }

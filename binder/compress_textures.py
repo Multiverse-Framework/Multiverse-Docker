@@ -1,5 +1,6 @@
 import os
 from PIL import Image
+from tqdm import tqdm
 import argparse
 
 def list_files(root_dir, ends=".bmp"):
@@ -43,7 +44,7 @@ if __name__ == '__main__':
     mtl_files = list_files(IMG_DIR, ".mtl")
     obj_files = list_files(IMG_DIR, ".obj")
 
-    for i in bmp_files:
+    for i in tqdm(bmp_files):
         new_img = os.path.basename(convert_bmp_to_jpg(i, MAX_SIZE))
         old_img = os.path.basename(i)
         replace_texture_file(dae_files, old_img, new_img)
