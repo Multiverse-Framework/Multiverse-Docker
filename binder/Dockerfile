@@ -42,11 +42,6 @@ COPY --chown=${NB_USER}:users binder/iros.jupyterlab-workspace /home/Multiverse/
 # Fix the mesh obj url in marker array
 COPY --chown=${NB_USER}:users binder/me /home/Multiverse/giskard_ws/src/me
 
-# Compress IAI apartment 3d model texture
-RUN python3 /home/binder/compress_textures.py \
-    --img_path=/home/Multiverse/multiverse_ws/src/multiverse_world/iai_apartment\
-    --max_size=512
-
 # Install ROS web tools under workspace giskard_ws
 USER ${NB_USER}
 WORKDIR /home/Multiverse/giskard_ws/src
@@ -56,13 +51,14 @@ RUN wstool init && \
 RUN rosdep update
 USER root
 RUN apt update && rosdep install -y --ignore-src --from-paths ./ -r
-RUN chown -R ${NB_UID} /home/${NB_USER}
+RUN chown -R ${NB_UID} /home/${NB_USER} && \
+    chown  ${NB_UID} /home/Multiverse
 USER ${NB_USER}
 RUN catkin build
 
 # Install OH-My-Bash
-RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)" && \
-    sed -i 's/OSH_THEME="font"/OSH_THEME="cupcake"/' /home/${NB_USER}/.bashrc
+RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)" --unattended && \
+    sed -i 's/OSH_THEME="font"/OSH_THEME="half-life"/' /home/${NB_USER}/.bashrc
 COPY --chown=${NB_USER}:users binder/jupyter-settings.json /usr/local/share/jupyter/lab/settings/overrides.json
 
 USER ${NB_USER}
