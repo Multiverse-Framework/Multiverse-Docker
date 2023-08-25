@@ -35,15 +35,8 @@ services:
     networks:
       ros-network:
         ipv4_address: ${ROS_IP_MULTIVERSE_SERVER}
-    environment:
-      - ROS_MASTER_URI=http://ros-core:11311
-      - ROS_IP=${ROS_IP_MULTIVERSE_SERVER}
-    volumes:
-      - ./images/Multiverse-image/Multiverse/multiverse_ws/src/multiverse_core/multiverse_server:/home/Multiverse/multiverse_ws/src/multiverse_core/multiverse_server:rw
     entrypoint: /entrypoint.bash
-    command: sh -c "roslaunch multiverse_server multiverse_server.launch server_socket_host:=tcp://${ROS_IP_MULTIVERSE_SERVER}"
-    depends_on:
-      - ros-core-service
+    command: sh -c "multiverse_server"
 
   multiverse-client-mujoco-service:
     tty: true

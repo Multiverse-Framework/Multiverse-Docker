@@ -5,17 +5,17 @@ FROM ros:${ROS_DISTRO}-ros-core
 ARG DEBIAN_FRONTEND=noninteractive 
 
 # Copy packages
-COPY Multiverse/build.sh /home/Multiverse/build.sh
-COPY Multiverse/build_ws.sh /home/Multiverse/build_ws.sh
-COPY Multiverse/src /home/Multiverse/src
+COPY Multiverse/build_third_parties.sh /home/Multiverse/build_third_parties.sh
+COPY Multiverse/build_multiverse.sh /home/Multiverse/build_multiverse.sh
+COPY Multiverse/build_multiverse_ws.sh /home/Multiverse/build_multiverse_ws.sh
+COPY Multiverse/multiverse /home/Multiverse/multiverse
 COPY Multiverse/multiverse_ws/src/multiverse_connectors /home/Multiverse/multiverse_ws/src/multiverse_connectors
 COPY Multiverse/multiverse_ws/src/multiverse_core /home/Multiverse/multiverse_ws/src/multiverse_core
 WORKDIR /home/Multiverse
 
 # Install prerequisites
-RUN apt-get update && apt install -y \
+RUN apt-get update && apt-get install -y \
   python3-pip \
-  python3.8-dev \
   python3-catkin-tools \
   python3-rosdep \
   libglfw3 \
@@ -42,10 +42,17 @@ RUN apt-get update && apt install -y \
   wayland-protocols \
   libxkbcommon-dev \
   libdbus-1-dev \
-  linux-libc-dev
+  linux-libc-dev \
+  pybind11-dev
+
+# Install and link python3.8
+RUN apt-get install -y python3.8-dev && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 100
 
 # Install and link gcc-11
-RUN add-apt-repository ppa:ubuntu-toolchain-r/test && apt install -y gcc-11 && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 1
+RUN add-apt-repository ppa:ubuntu-toolchain-r/test && apt install -y gcc-11 && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100
+
+# Install and link clang-11
+RUN apt-get install -y clang-11 libc++-11-dev libstdc++-11-dev libc++abi-11-dev llvm-11-dev && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang-11 100
 
 RUN pip3 install \
   pyside6 \
@@ -56,9 +63,11 @@ RUN pip3 install \
   jinja2 \
   pybind11
 
-RUN ./build.sh
+RUN ./build_third_parties.sh
 
-RUN ./build_ws.sh
+RUN ./build_multiverse.sh
+
+RUN rosdep init && rosdep fix-permissions && ./build_multiverse_ws.sh
 
 # Create entrypoint
 SHELL ["/bin/bash", "-c"]
