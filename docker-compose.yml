@@ -61,6 +61,7 @@ services:
     entrypoint: /entrypoint.bash
     command: sh -c "roslaunch tiago_dual_in_apartment mujoco.launch headless:=true server_host:=tcp://${ROS_IP_MULTIVERSE_SERVER}"
     depends_on:
+      - ros-core-service
       - multiverse-server-service
 
   multiverse-client-ros-service:
@@ -84,6 +85,7 @@ services:
     entrypoint: /entrypoint.bash
     command: sh -c "roslaunch tiago_dual_in_apartment multiverse_socket.launch server_host:=tcp://${ROS_IP_MULTIVERSE_SERVER}"
     depends_on:
+      - ros-core-service
       - multiverse-server-service
 
   giskard-service:
@@ -109,12 +111,38 @@ services:
     entrypoint: /entrypoint.bash
     command: sh -c "roslaunch tiago_dual_control tiago_dual_giskard.launch"
     depends_on:
+      - ros-core-service
       - multiverse-client-mujoco-service
       - multiverse-client-ros-service
 
+  cram-service:
+    tty: true
+    image: multiverseframework/cram:${ROS_DISTRO}
+    build:
+      context: ./images/Cram-image/
+      dockerfile: Dockerfile
+      args:
+        ROS_DISTRO: ${ROS_DISTRO}
+    container_name: cram-container
+    hostname: cram
+    networks:
+      ros-network:
+        ipv4_address: ${ROS_IP_CRAM}
+    environment:
+      - HOST_IP=${HOST_IP}
+      - ROS_MASTER_URI=http://ros-core:11311
+      - ROS_IP=${ROS_IP_CRAM}
+    volumes:
+      - ./images/Cram-image/pycram:/home/Multiverse/cram_ws/src/pycram:rw
+      - ./images/Cram-image/kdl_ik_services:/home/Multiverse/cram_ws/src/kdl_ik_services:rw
+    entrypoint: /entrypoint.bash
+    command: sh -c "roslaunch pycram ik_and_description.launch robot:=tiago_dual"
+    depends_on:
+      - ros-core-service
+
   rviz-service:
     tty: true
-    image: multiverseframework/giskard:${ROS_DISTRO}
+    image: multiverseframework/cram:${ROS_DISTRO}
     container_name: rviz-container
     hostname: rviz
     networks:
@@ -128,6 +156,7 @@ services:
       - ROS_IP=${ROS_IP_RVIZ}
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ./images/Cram-image/pycram:/home/Multiverse/cram_ws/src/pycram:rw
       - ./images/Giskard-image/giskard_msgs:/home/Multiverse/giskard_ws/src/giskard_msgs:rw
       - ./images/Giskard-image/giskardpy:/home/Multiverse/giskard_ws/src/giskardpy:rw
       - ./images/MultiverseDemos-image/multiverse_objects:/home/Multiverse/multiverse_ws/src/multiverse_objects:rw
@@ -137,5 +166,37 @@ services:
     entrypoint: /entrypoint.bash
     command: sh -c "roslaunch tiago_dual_in_apartment rviz.launch"
     depends_on:
+      - ros-core-service
       - multiverse-client-ros-service
       - giskard-service
+
+  demo-service:
+    tty: true
+    image: multiverseframework/cram:${ROS_DISTRO}
+    container_name: demo-container
+    hostname: demo
+    networks:
+      ros-network:
+        ipv4_address: ${ROS_IP_DEMO}
+    environment:
+      - DISPLAY
+      - QT_X11_NO_MITSHM=1 #fix some QT bugs
+      - HOST_IP=${HOST_IP}
+      - ROS_MASTER_URI=http://ros-core:11311
+      - ROS_IP=${ROS_IP_DEMO}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ./images/Cram-image/pycram:/home/Multiverse/cram_ws/src/pycram:rw
+      - ./images/Giskard-image/giskard_msgs:/home/Multiverse/giskard_ws/src/giskard_msgs:rw
+      - ./images/Giskard-image/giskardpy:/home/Multiverse/giskard_ws/src/giskardpy:rw
+      - ./images/MultiverseDemos-image/multiverse_objects:/home/Multiverse/multiverse_ws/src/multiverse_objects:rw
+      - ./images/MultiverseDemos-image/multiverse_robots:/home/Multiverse/multiverse_ws/src/multiverse_robots:rw
+      - ./images/MultiverseDemos-image/multiverse_world:/home/Multiverse/multiverse_ws/src/multiverse_world:rw
+      - ./images/MultiverseDemos-image/multiverse_demos:/home/Multiverse/multiverse_ws/src/multiverse_demos:rw
+    entrypoint: /entrypoint.bash
+    command: sh -c "python3 /home/Multiverse/multiverse_ws/src/multiverse_demos/tiago_dual_in_apartment/scripts/bring_me_the_spoon.py"
+    depends_on:
+      - ros-core-service
+      # - multiverse-client-ros-service
+      # - giskard-service
+      - cram-service
