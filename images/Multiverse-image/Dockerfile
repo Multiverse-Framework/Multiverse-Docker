@@ -5,12 +5,7 @@ FROM ros:${ROS_DISTRO}-ros-core
 ARG DEBIAN_FRONTEND=noninteractive 
 
 # Copy packages
-COPY Multiverse/build_third_parties.sh /home/Multiverse/build_third_parties.sh
-COPY Multiverse/build_multiverse.sh /home/Multiverse/build_multiverse.sh
-COPY Multiverse/build_multiverse_ws.sh /home/Multiverse/build_multiverse_ws.sh
-COPY Multiverse/multiverse /home/Multiverse/multiverse
-COPY Multiverse/multiverse_ws/src/multiverse_connectors /home/Multiverse/multiverse_ws/src/multiverse_connectors
-COPY Multiverse/multiverse_ws/src/multiverse_core /home/Multiverse/multiverse_ws/src/multiverse_core
+COPY Multiverse /home/Multiverse
 WORKDIR /home/Multiverse
 
 # Install prerequisites

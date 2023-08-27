@@ -35,8 +35,7 @@ services:
     networks:
       ros-network:
         ipv4_address: ${ROS_IP_MULTIVERSE_SERVER}
-    entrypoint: /entrypoint.bash
-    command: sh -c "multiverse_server"
+    entrypoint: /home/Multiverse/multiverse/bin/multiverse_server
 
   multiverse-client-mujoco-service:
     tty: true
@@ -60,7 +59,7 @@ services:
       - ./images/MultiverseDemos-image/multiverse_world:/home/Multiverse/multiverse_ws/src/multiverse_world:rw
       - ./images/MultiverseDemos-image/multiverse_demos:/home/Multiverse/multiverse_ws/src/multiverse_demos:rw
     entrypoint: /entrypoint.bash
-    command: sh -c "roslaunch tiago_dual_in_apartment mujoco.launch headless:=true"
+    command: sh -c "roslaunch tiago_dual_in_apartment mujoco.launch headless:=true server_host:=tcp://${ROS_IP_MULTIVERSE_SERVER}"
     depends_on:
       - multiverse-server-service
 
@@ -76,13 +75,14 @@ services:
       - HOST_IP=${HOST_IP}
       - ROS_MASTER_URI=http://ros-core:11311
       - ROS_IP=${ROS_IP_MULTIVERSE_CLIENT_ROS}
+      - PYTHONPATH=/home/Multiverse/multiverse/lib/libstdc++/python
     volumes:
       - ./images/MultiverseDemos-image/multiverse_objects:/home/Multiverse/multiverse_ws/src/multiverse_objects:rw
       - ./images/MultiverseDemos-image/multiverse_robots:/home/Multiverse/multiverse_ws/src/multiverse_robots:rw
       - ./images/MultiverseDemos-image/multiverse_world:/home/Multiverse/multiverse_ws/src/multiverse_world:rw
       - ./images/MultiverseDemos-image/multiverse_demos:/home/Multiverse/multiverse_ws/src/multiverse_demos:rw
     entrypoint: /entrypoint.bash
-    command: sh -c "roslaunch tiago_dual_in_apartment multiverse_client.launch"
+    command: sh -c "roslaunch tiago_dual_in_apartment multiverse_socket.launch server_host:=tcp://${ROS_IP_MULTIVERSE_SERVER}"
     depends_on:
       - multiverse-server-service
 

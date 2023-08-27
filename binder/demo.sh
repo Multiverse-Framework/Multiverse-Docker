@@ -1,7 +1,6 @@
 #!/bin/bash
 
-source /home/Multiverse/multiverse_ws/devel/setup.bash && \
-  roslaunch multiverse_server multiverse_server.launch &
+multiverse_server
 
 source /home/Multiverse/multiverse_ws/devel/setup.bash && \
   roslaunch tiago_dual_in_apartment mujoco.launch headless:=true &
