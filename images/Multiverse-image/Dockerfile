@@ -60,6 +60,9 @@ RUN pip3 install \
 
 RUN ./build_third_parties.sh
 
+ENV PATH=${PATH}:/home/Multiverse/multiverse/bin
+ENV PYTHONPATH=${PYTHONPATH}:/home/Multiverse/multiverse/build/USD/lib/python:/home/Multiverse/multiverse/lib/libstdc++/python
+
 RUN ./build_multiverse.sh
 
 RUN rosdep init && rosdep fix-permissions && ./build_multiverse_ws.sh

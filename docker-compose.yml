@@ -73,10 +73,8 @@ services:
       ros-network:
         ipv4_address: ${ROS_IP_MULTIVERSE_CLIENT_ROS}
     environment:
-      - HOST_IP=${HOST_IP}
       - ROS_MASTER_URI=http://ros-core:11311
       - ROS_IP=${ROS_IP_MULTIVERSE_CLIENT_ROS}
-      - PYTHONPATH=/home/Multiverse/multiverse/lib/libstdc++/python
     volumes:
       - ./images/MultiverseDemos-image/multiverse_objects:/home/Multiverse/multiverse_ws/src/multiverse_objects:rw
       - ./images/MultiverseDemos-image/multiverse_robots:/home/Multiverse/multiverse_ws/src/multiverse_robots:rw
@@ -102,7 +100,6 @@ services:
       ros-network:
         ipv4_address: ${ROS_IP_GISKARD}
     environment:
-      - HOST_IP=${HOST_IP}
       - ROS_MASTER_URI=http://ros-core:11311
       - ROS_IP=${ROS_IP_GISKARD}
     volumes:
@@ -130,7 +127,6 @@ services:
       ros-network:
         ipv4_address: ${ROS_IP_CRAM}
     environment:
-      - HOST_IP=${HOST_IP}
       - ROS_MASTER_URI=http://ros-core:11311
       - ROS_IP=${ROS_IP_CRAM}
     volumes:
@@ -152,7 +148,6 @@ services:
     environment:
       - DISPLAY
       - QT_X11_NO_MITSHM=1 #fix some QT bugs
-      - HOST_IP=${HOST_IP}
       - ROS_MASTER_URI=http://ros-core:11311
       - ROS_IP=${ROS_IP_RVIZ}
     volumes:
@@ -182,7 +177,6 @@ services:
     environment:
       - DISPLAY
       - QT_X11_NO_MITSHM=1 #fix some QT bugs
-      - HOST_IP=${HOST_IP}
       - ROS_MASTER_URI=http://ros-core:11311
       - ROS_IP=${ROS_IP_DEMO}
     volumes:
