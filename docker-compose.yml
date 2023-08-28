@@ -106,6 +106,7 @@ services:
       - ROS_MASTER_URI=http://ros-core:11311
       - ROS_IP=${ROS_IP_GISKARD}
     volumes:
+      - ./images/MultiverseDemos-image/multiverse_robots:/home/Multiverse/multiverse_ws/src/multiverse_robots:rw
       - ./images/Giskard-image/giskard_msgs:/home/Multiverse/giskard_ws/src/giskard_msgs:rw
       - ./images/Giskard-image/giskardpy:/home/Multiverse/giskard_ws/src/giskardpy:rw
     entrypoint: /entrypoint.bash
