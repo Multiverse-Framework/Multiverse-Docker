@@ -35,7 +35,7 @@ services:
     networks:
       ros-network:
         ipv4_address: ${ROS_IP_MULTIVERSE_SERVER}
-    entrypoint: /home/Multiverse/multiverse/bin/multiverse_server
+    entrypoint: multiverse_server
 
   multiverse-client-mujoco-service:
     tty: true
