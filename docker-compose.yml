@@ -10,12 +10,7 @@ networks:
 services:
   ros-core-service:
     tty: true
-    image: multiverseframework/multiverse:${ROS_DISTRO}
-    build:
-      context: ./images/Multiverse-image/
-      dockerfile: Dockerfile
-      args:
-        ROS_DISTRO: ${ROS_DISTRO}
+    image: ros:${ROS_DISTRO}-ros-core
     container_name: ros-core-container
     hostname: ros-core
     networks:
@@ -24,7 +19,6 @@ services:
     environment:
       - ROS_MASTER_URI=http://${ROS_IP_CORE}:11311
       - ROS_IP=${ROS_IP_CORE}
-    entrypoint: /entrypoint.bash
     command: roscore
 
   multiverse-server-service:
