@@ -24,6 +24,11 @@ services:
   multiverse-server-service:
     tty: true
     image: multiverseframework/multiverse:${ROS_DISTRO}
+    build:
+      context: ./images/Multiverse-image/
+      dockerfile: Dockerfile
+      args:
+        ROS_DISTRO: ${ROS_DISTRO}
     container_name: multiverse-server-container
     hostname: multiverse-server
     networks:
