@@ -21,8 +21,6 @@ RUN apt-get update && apt install -y \
   ros-${ROS_DISTRO}-joint-state-publisher-gui \
   ros-${ROS_DISTRO}-effort-controllers \
   ros-${ROS_DISTRO}-gripper-action-controller \
-  ros-${ROS_DISTRO}-move-base \
-  ros-${ROS_DISTRO}-map-server \
   ros-${ROS_DISTRO}-dwa-local-planner
 
 RUN cd multiverse_ws && rosdep install --from-paths src --ignore-src -r -y && . /opt/ros/noetic/setup.sh && catkin build
