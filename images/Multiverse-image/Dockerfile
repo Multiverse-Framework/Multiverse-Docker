@@ -49,12 +49,15 @@ RUN add-apt-repository ppa:ubuntu-toolchain-r/test && apt install -y gcc-11 && u
 # Install and link clang-11
 RUN apt-get install -y clang-11 libc++-11-dev libstdc++-11-dev libc++abi-11-dev llvm-11-dev && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang-11 100
 
+RUN pip3 install --upgrade pip
+
 RUN pip3 install \
   pyside6 \
   pyopengl \
   wheel \
   cython \
   owlready2 \
+  markupsafe==2.0.1 \
   jinja2 \
   pybind11
 

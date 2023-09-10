@@ -11,7 +11,7 @@ COPY multiverse_world /home/Multiverse/multiverse_ws/src/multiverse_world
 COPY multiverse_demos /home/Multiverse/multiverse_ws/src/multiverse_demos
 
 # Install prerequisites
-RUN apt-get update && apt install -y \
+RUN apt-get update && apt-get install -y \
   ros-${ROS_DISTRO}-xacro \
   ros-${ROS_DISTRO}-rviz \
   ros-${ROS_DISTRO}-joint-trajectory-controller \
@@ -23,7 +23,7 @@ RUN apt-get update && apt install -y \
   ros-${ROS_DISTRO}-gripper-action-controller \
   ros-${ROS_DISTRO}-dwa-local-planner
 
-RUN cd multiverse_ws && rosdep install --from-paths src --ignore-src -r -y && . /opt/ros/noetic/setup.sh && catkin build
+RUN cd multiverse_ws && rosdep install --from-paths src --ignore-src -r -y && . /opt/ros/${ROS_DISTRO}/setup.sh && catkin build
 
 # Create entrypoint
 SHELL ["/bin/bash", "-c"]
