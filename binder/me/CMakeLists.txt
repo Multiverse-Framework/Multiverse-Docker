@@ -12,11 +12,5 @@ execute_process(
 
 execute_process(
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  COMMAND mkdir -p Multiverse/giskard_ws/src
+  COMMAND ln -s /home/Mutiverse Multiverse
 )
-
-execute_process(
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  COMMAND ln -s ${CMAKE_CURRENT_SOURCE_DIR}/../giskardpy Multiverse/giskard_ws/src/giskardpy
-)
-
