@@ -87,6 +87,24 @@
         "topic": "/eef_control"
       },
       "type": "interactiveMarkers"
+    },
+    {
+      "isShown": true,
+      "name": "Box model",
+      "options": {
+        "param": "box_description",
+        "tfPrefix": ""
+      },
+      "type": "urdf"
+    },
+    {
+      "isShown": true,
+      "name": "Milk box model",
+      "options": {
+        "param": "milk_box_description",
+        "tfPrefix": ""
+      },
+      "type": "urdf"
     }
   ]
 }

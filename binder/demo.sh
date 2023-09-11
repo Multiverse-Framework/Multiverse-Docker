@@ -1,12 +1,12 @@
 #!/bin/bash
 
-multiverse_server
+multiverse_server &
 
 source /home/Multiverse/multiverse_ws/devel/setup.bash && \
   roslaunch tiago_dual_in_apartment mujoco.launch headless:=true &
 
 source /home/Multiverse/multiverse_ws/devel/setup.bash && \
-  roslaunch tiago_dual_in_apartment multiverse_client.launch &
+  roslaunch tiago_dual_in_apartment multiverse_socket.launch &
 
 source /home/Multiverse/giskard_ws/devel/setup.bash && \
   roslaunch tiago_dual_control tiago_dual_giskard.launch &

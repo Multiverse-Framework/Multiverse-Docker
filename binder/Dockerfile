@@ -32,9 +32,7 @@ RUN pip install --no-cache-dir notebook==6.4.12 jupyterlab==3.6.5 \
 
 # Allow user ${NB_USER} write some directories
 WORKDIR /home/Multiverse/giskard_ws
-RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws/logs && \
-    chown -R ${NB_UID} /home/Multiverse/multiverse_ws/src && \
-    chown -R ${NB_UID} /home/Multiverse/giskard_ws
+RUN chown -R ${NB_UID} /home/Multiverse/
 
 # Copy necessary files
 COPY --chown=${NB_USER}:users binder /home/binder
@@ -60,6 +58,10 @@ RUN catkin build
 RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)" --unattended && \
     sed -i 's/OSH_THEME="font"/OSH_THEME="half-life"/' /home/${NB_USER}/.bashrc
 COPY --chown=${NB_USER}:users binder/jupyter-settings.json /usr/local/share/jupyter/lab/settings/overrides.json
+
+# Instal bash kernel
+RUN pip3 install panel jupyter-server bash_kernel
+RUN python3 -m bash_kernel.install
 
 USER ${NB_USER}
 WORKDIR /home/Multiverse
