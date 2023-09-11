@@ -48,7 +48,7 @@ The other 4 services in the [../docker-compose.yml](../docker-compose.yml) need 
 
     ```bash
     source /home/Multiverse/multiverse_ws/devel/setup.bash && \
-      roslaunch tiago_dual_in_apartment multiverse_client.launch
+      roslaunch tiago_dual_in_apartment multiverse_socket.launch
     ```
 
 1. Start ***giskard-service***
