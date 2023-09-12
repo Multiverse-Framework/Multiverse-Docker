@@ -23,12 +23,12 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - &&\
 # Install jupyterlab and related python packages
 RUN pip install pip --upgrade
 RUN pip install --no-cache-dir notebook==6.4.12 jupyterlab==3.6.5 \
-        wstool pyOpenSSL==23.2.0 pyyaml==5.3.1 cryptography==38.0.4 \
-        jupyter-resource-usage jupyter-offlinenotebook \
-        jupyter-server-proxy jupyterlab-git jlab-enhanced-cell-toolbar \
-        autobahn gnupg twisted cbor2 empy ipywidgets  \
-        pymongo Pillow pycryptodomex simplejpeg tqdm \
-        https://raw.githubusercontent.com/yxzhan/jupyterlab-rviz/master/release/jupyterlab_rviz-0.2.5.tar.gz
+    wstool pyOpenSSL==23.2.0 pyyaml==5.3.1 cryptography==38.0.4 \
+    jupyter-resource-usage jupyter-offlinenotebook \
+    jupyter-server-proxy jupyterlab-git jlab-enhanced-cell-toolbar \
+    autobahn gnupg twisted cbor2 empy ipywidgets  \
+    pymongo Pillow pycryptodomex simplejpeg tqdm \
+    https://raw.githubusercontent.com/yxzhan/jupyterlab-rviz/master/release/jupyterlab_rviz-0.2.5.tar.gz
 
 # Allow user ${NB_USER} write some directories
 WORKDIR /home/Multiverse/giskard_ws
@@ -43,7 +43,9 @@ COPY --chown=${NB_USER}:users binder/me /home/Multiverse/multiverse_ws/src/me
 
 # Update every workspace
 WORKDIR /home/Multiverse
-RUN git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && git pull origin main
+RUN git config --global --add safe.directory /home/Multiverse && \
+    git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && \
+    git pull origin main
 
 # Install ROS web tools under workspace multiverse_ws
 USER ${NB_USER}
