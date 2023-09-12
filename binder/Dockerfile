@@ -36,13 +36,14 @@ RUN chown -R ${NB_UID} /home/Multiverse/
 
 # Copy necessary files
 COPY --chown=${NB_USER}:users binder /home/binder
-COPY --chown=${NB_USER}:users binder/iros.jupyterlab-workspace /home/Multiverse/
+# COPY --chown=${NB_USER}:users binder/iros.jupyterlab-workspace /home/Multiverse/
+COPY --chown=${NB_USER}:users binder/demo.sh /home/Multiverse/
 # Fix the mesh obj url in marker array
-COPY --chown=${NB_USER}:users binder/me /home/Multiverse/giskard_ws/src/me
+COPY --chown=${NB_USER}:users binder/me /home/Multiverse/multiverse_ws/src/me
 
-# Install ROS web tools under workspace giskard_ws
+# Install ROS web tools under workspace multiverse_ws
 USER ${NB_USER}
-WORKDIR /home/Multiverse/giskard_ws/src
+WORKDIR /home/Multiverse/multiverse_ws/src
 RUN wstool init && \
     wstool merge https://raw.githubusercontent.com/yxzhan/rvizweb/master/.rosinstall && \
     wstool update

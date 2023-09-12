@@ -7,3 +7,5 @@ images/MultiverseDemos-image/multiverse_demos/
 images/MultiverseDemos-image/multiverse_objects/
 images/MultiverseDemos-image/multiverse_robots/
 images/MultiverseDemos-image/multiverse_world/
+
+*.vscode

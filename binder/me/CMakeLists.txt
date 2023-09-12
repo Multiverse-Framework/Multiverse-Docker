@@ -12,5 +12,5 @@ execute_process(
 
 execute_process(
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  COMMAND ln -s /home/Mutiverse Multiverse
+  COMMAND ln -s /home/Multiverse Multiverse
 )
