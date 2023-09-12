@@ -41,6 +41,10 @@ COPY --chown=${NB_USER}:users binder/demo.sh /home/Multiverse/
 # Fix the mesh obj url in marker array
 COPY --chown=${NB_USER}:users binder/me /home/Multiverse/multiverse_ws/src/me
 
+# Update every workspace
+WORKDIR /home/Multiverse
+RUN git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && git pull origin main
+
 # Install ROS web tools under workspace multiverse_ws
 USER ${NB_USER}
 WORKDIR /home/Multiverse/multiverse_ws/src
