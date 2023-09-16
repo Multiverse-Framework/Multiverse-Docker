@@ -1,5 +1,7 @@
 # Multiverse-Docker
 
+This repository demonstrates the robotics task execution in Docker environment. For more details please visit [Multiverse-Framework](https://github.com/Multiverse-Framework/Multiverse/tree/ICRA-2024), [Multiverse-Parser](https://github.com/Multiverse-Framework/Multiverse/tree/ICRA-2024/multiverse/modules/multiverse_parser) and [Multiverse-Knowledge](https://github.com/Multiverse-Framework/Multiverse/tree/ICRA-2024/multiverse/modules/multiverse_knowledge).
+
 ## Prerequisites `https://docs.docker.com/desktop/install/ubuntu/`
 
 Check your docker-compose and docker-py versions:
@@ -50,4 +52,3 @@ export ROS_IP=$(hostname -I | awk '{print $1}') #your IP
 rostopic list # It will show all ROS topic in the docker environment
 ```
 
-For more details please visit [Multiverse-Framework](https://github.com/Multiverse-Framework/Multiverse/tree/ICRA-2024), [Multiverse-Parser](https://github.com/Multiverse-Framework/Multiverse/tree/ICRA-2024/multiverse/modules/multiverse_parser) and [Multiverse-Knowledge](https://github.com/Multiverse-Framework/Multiverse/tree/ICRA-2024/multiverse/modules/multiverse_knowledge)
