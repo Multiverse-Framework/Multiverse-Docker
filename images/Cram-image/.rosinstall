@@ -1,8 +1,0 @@
-- git:
-    local-name: pycram
-    uri: https://github.com/Multiverse-Framework/pycram.git
-    version: dev
-- git: 
-    local-name: kdl_ik_services
-    uri: https://github.com/cram2/kdl_ik_service.git
-    version: master

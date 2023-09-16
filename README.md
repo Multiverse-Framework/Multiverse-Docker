@@ -19,11 +19,9 @@ docker compose up giskard-service
 ./run_rviz.bash
 ```
 
-3. Run CRAM as standalone
+3. Run the demo
 
 ```bash
-docker compose up ros-core-service
-docker compose up cram-service
 ./run_demo.bash
 ```
 
