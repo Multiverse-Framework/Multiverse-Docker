@@ -35,7 +35,7 @@ docker compose up giskard-service
 
 ### 3. Run the demo (either `demo_1` or `demo_2`)
 
-Open a new terminal and go into the docker container `giskard-container`
+Open a new terminal and get inside the docker container `giskard-container`
 
 ```bash
 docker exec -it giskard-container bash
@@ -51,6 +51,18 @@ or
 
 ```bash
 source /home/Multiverse/giskard_ws/devel/setup.bash && rosrun tiago_dual_in_apartment box_unpacking.py --spawn_object=spoon 
+```
+
+To visualize the simulation with Unreal Engine, open a new terminal and run either
+
+```bash
+./UE-packages/Demo1/MultiverseDemo.sh # For milk_box demo
+```
+
+or
+
+```bash
+./UE-packages/Demo2/MultiverseDemo.sh # For spoon demo
 ```
 
 The result should look like this:
