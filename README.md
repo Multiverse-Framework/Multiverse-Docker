@@ -13,11 +13,12 @@ $ docker compose version
 Docker Compose version v2.20.2
 ```
 
-### 1. Setup the docker
+### 1. Setup the docker and Unreal Engine packages
 
 ```bash
 sudo ./setup_nvidia_docker.bash
 ./setup_images.bash
+./setup_packages.bash
 docker compose pull
 ```
 
