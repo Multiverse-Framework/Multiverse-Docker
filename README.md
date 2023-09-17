@@ -34,14 +34,22 @@ docker compose up giskard-service
 
 ### 3. Run the demo (either `demo_1` or `demo_2`)
 
+Go into the docker container `giskard-container`
+
 ```bash
-./run_demo_1.bash
+docker exec -it giskard-container bash
+```
+
+Run either
+
+```bash
+source /home/Multiverse/giskard_ws/devel/setup.bash && rosrun tiago_dual_in_apartment box_unpacking.py --spawn_object=milk_box 
 ```
 
 or
 
 ```bash
-./run_demo_2.bash
+source /home/Multiverse/giskard_ws/devel/setup.bash && rosrun tiago_dual_in_apartment box_unpacking.py --spawn_object=spoon 
 ```
 
 ### 4. Connect to docker container via ROS
@@ -51,4 +59,3 @@ export ROS_MASTER_URI=http://192.168.75.2:11311
 export ROS_IP=$(hostname -I | awk '{print $1}') #your IP
 rostopic list # It will show all ROS topic in the docker environment
 ```
-
