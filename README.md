@@ -23,6 +23,7 @@ docker compose pull
 
 ### 2. Run the cluster
 
+Open 6 terminals, each runs one command below
 ```bash
 docker compose up ros-core-service
 docker compose up multiverse-server-service
@@ -34,7 +35,7 @@ docker compose up giskard-service
 
 ### 3. Run the demo (either `demo_1` or `demo_2`)
 
-Go into the docker container `giskard-container`
+Open a new terminal and go into the docker container `giskard-container`
 
 ```bash
 docker exec -it giskard-container bash
@@ -51,6 +52,11 @@ or
 ```bash
 source /home/Multiverse/giskard_ws/devel/setup.bash && rosrun tiago_dual_in_apartment box_unpacking.py --spawn_object=spoon 
 ```
+
+The result should look like this:
+
+![Result](https://github.com/Multiverse-Framework/Multiverse-Docker/assets/64316740/a7aa9d00-5fa5-4bbf-a376-67ad884fdd1a)
+
 
 ### 4. Connect to docker container via ROS
 
