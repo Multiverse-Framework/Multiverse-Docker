@@ -23,7 +23,7 @@ services:
 
   multiverse-server-service:
     tty: true
-    image: multiverseframework/multiverse:icra-2024
+    image: multiverseframework/multiverse:iros-2023
     build:
       context: ./images/Multiverse-image/
       dockerfile: Dockerfile
@@ -38,7 +38,7 @@ services:
 
   multiverse-client-mujoco-service:
     tty: true
-    image: multiverseframework/multiverse-demos:icra-2024
+    image: multiverseframework/multiverse-demos:iros-2023
     build:
       context: ./images/MultiverseDemos-image/
       dockerfile: Dockerfile
@@ -65,7 +65,7 @@ services:
 
   multiverse-client-ros-service:
     tty: true
-    image: multiverseframework/multiverse-demos:icra-2024
+    image: multiverseframework/multiverse-demos:iros-2023
     container_name: multiverse-client-ros-container
     hostname: multiverse-client-ros
     networks:
@@ -87,7 +87,7 @@ services:
 
   giskard-service:
     tty: true
-    image: multiverseframework/giskard:icra-2024
+    image: multiverseframework/giskard:iros-2023
     build:
       context: ./images/Giskard-image/
       dockerfile: Dockerfile
@@ -113,7 +113,7 @@ services:
 
   rviz-service:
     tty: true
-    image: multiverseframework/giskard:icra-2024
+    image: multiverseframework/giskard:iros-2023
     container_name: rviz-container
     hostname: rviz
     networks:

@@ -1,16 +1,16 @@
 - git:
     local-name: multiverse_objects
     uri: git@github.com:Multiverse-Framework/Multiverse-Objects.git
-    version: ICRA-2024
+    version: IROS-2023
 - git:
     local-name: multiverse_robots
     uri: git@github.com:Multiverse-Framework/Multiverse-Robots.git
-    version: ICRA-2024
+    version: IROS-2023
 - git:
     local-name: multiverse_world
     uri: git@github.com:Multiverse-Framework/Multiverse-World.git
-    version: ICRA-2024
+    version: IROS-2023
 - git:
     local-name: multiverse_demos
     uri: git@github.com:Multiverse-Framework/Multiverse-Demos.git
-    version: ICRA-2024
+    version: IROS-2023

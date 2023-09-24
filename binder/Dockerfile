@@ -1,4 +1,11 @@
-FROM multiverseframework/giskard:noetic
+FROM multiverseframework/giskard:iros-2023
+
+RUN git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && git checkout IROS-2023 && git pull origin IROS-2023
+RUN cd /home/Multiverse/multiverse_ws/src/multiverse_world && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-World.git && git checkout IROS-2023 && git pull origin IROS-2023
+RUN cd /home/Multiverse/multiverse_ws/src/multiverse_robots && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Robots.git && git checkout IROS-2023 && git pull origin IROS-2023
+RUN cd /home/Multiverse/multiverse_ws/src/multiverse_objects && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Objects.git && git checkout IROS-2023 && git pull origin IROS-2023
+RUN cd /home/Multiverse/multiverse_ws/src/multiverse_demos && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Demos.git && git checkout IROS-2023 && git pull origin IROS-2023
+RUN cd /home/Multiverse/giskard_ws/src/giskardpy && git remote set-url origin https://github.com/Multiverse-Framework/giskardpy.git && git checkout IROS-2023 && git pull origin IROS-2023
 
 USER root
 ENV SHELL=/bin/bash
@@ -32,7 +39,9 @@ RUN pip install --no-cache-dir notebook==6.4.12 jupyterlab==3.6.5 \
 
 # Allow user ${NB_USER} write some directories
 WORKDIR /home/Multiverse/giskard_ws
-RUN chown -R ${NB_UID} /home/Multiverse/
+RUN chown -R ${NB_UID} /tmp
+RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws
+RUN chown -R ${NB_UID} /home/Multiverse/giskard_ws
 
 # Copy necessary files
 COPY --chown=${NB_USER}:users binder /home/binder

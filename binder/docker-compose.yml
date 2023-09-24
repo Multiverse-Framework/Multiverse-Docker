@@ -1,7 +1,7 @@
 version: '3.4'
 services:
   binderhub:
-    image: multiverseframework/binder:noetic
+    image: multiverseframework/binder:iros-2023
     build:
       context: ../
       dockerfile: ./binder/Dockerfile
