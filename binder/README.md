@@ -22,7 +22,7 @@ docker build ./ -f ./binder/Dockerfile -t multiversedocker:binderhub
 
 ### Option 2: Run on BinderHub
 
-- [Link to the binderhub](https://binder.intel4coro.de/v2/gh/Multiverse-Framework/Multiverse-Docker.git/main)
+- [Link to the binderhub](https://binder.intel4coro.de/v2/gh/Multiverse-Framework/Multiverse-Docker/IROS-2023)
 
 ## Usage
 
