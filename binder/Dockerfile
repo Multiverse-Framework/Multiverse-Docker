@@ -40,6 +40,7 @@ RUN pip install --no-cache-dir notebook==6.4.12 jupyterlab==3.6.5 \
 # Allow user ${NB_USER} write some directories
 WORKDIR /home/Multiverse/giskard_ws
 RUN chown -R ${NB_UID} /tmp
+RUN chown -R ${NB_UID} /home/Multiverse/multiverse/modules/multiverse_knowledge/Konclude
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws
 RUN chown -R ${NB_UID} /home/Multiverse/giskard_ws
 
