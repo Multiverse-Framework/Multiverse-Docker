@@ -21,9 +21,19 @@ services:
       - ROS_IP=${ROS_IP_CORE}
     command: roscore
 
+  multiverse-core-service:
+    tty: true
+    image: multiverseframework/multiverse-core:ubuntu-20.04
+    build:
+      context: ./images/MultiverseCore-image/
+      dockerfile: Dockerfile
+      args:
+        ROS_DISTRO: ${ROS_DISTRO}
+    container_name: multiverse-core-container
+
   multiverse-server-service:
     tty: true
-    image: multiverseframework/multiverse:iros-2023
+    image: multiverseframework/multiverse-server:ubuntu-20.04
     build:
       context: ./images/Multiverse-image/
       dockerfile: Dockerfile
@@ -38,7 +48,7 @@ services:
 
   multiverse-client-mujoco-service:
     tty: true
-    image: multiverseframework/multiverse-demos:iros-2023
+    image: multiverseframework/multiverse-demos:ubuntu-20.04
     build:
       context: ./images/MultiverseDemos-image/
       dockerfile: Dockerfile
@@ -65,7 +75,7 @@ services:
 
   multiverse-client-ros-service:
     tty: true
-    image: multiverseframework/multiverse-demos:iros-2023
+    image: multiverseframework/multiverse-demos:ubuntu-20.04
     container_name: multiverse-client-ros-container
     hostname: multiverse-client-ros
     networks:
@@ -87,7 +97,7 @@ services:
 
   giskard-service:
     tty: true
-    image: multiverseframework/giskard:iros-2023
+    image: multiverseframework/giskard:ubuntu-20.04
     build:
       context: ./images/Giskard-image/
       dockerfile: Dockerfile
@@ -113,7 +123,7 @@ services:
 
   rviz-service:
     tty: true
-    image: multiverseframework/giskard:iros-2023
+    image: multiverseframework/giskard:ubuntu-20.04
     container_name: rviz-container
     hostname: rviz
     networks:

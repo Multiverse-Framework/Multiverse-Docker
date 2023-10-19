@@ -1,4 +1,4 @@
 - git:
     local-name: Multiverse
     uri: git@github.com:Multiverse-Framework/Multiverse.git
-    version: IROS-2023
+    version: main

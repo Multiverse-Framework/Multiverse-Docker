@@ -1,10 +1,10 @@
 ARG ROS_DISTRO
-FROM multiverseframework/multiverse:iros-2023
+FROM multiverseframework/multiverse:noetic
 
 # Zero interaction while installing or upgrading the system via apt, see https://bobcares.com/blog/debian_frontendnoninteractive-docker/
 ARG DEBIAN_FRONTEND=noninteractive 
 
-RUN git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && git checkout IROS-2023 && git pull origin IROS-2023
+RUN git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && git checkout main && git pull origin main
 
 # Copy packages
 COPY multiverse_objects /home/Multiverse/multiverse_ws/src/multiverse_objects

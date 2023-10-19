@@ -1,14 +1,14 @@
 ARG ROS_DISTRO
-FROM multiverseframework/multiverse-demos:iros-2023
+FROM multiverseframework/multiverse-demos:ubuntu-20.04
 
 # Zero interaction while installing or upgrading the system via apt, see https://bobcares.com/blog/debian_frontendnoninteractive-docker/
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && git checkout IROS-2023 && git pull origin IROS-2023
-RUN cd /home/Multiverse/multiverse_ws/src/multiverse_world && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-World.git && git checkout IROS-2023 && git pull origin IROS-2023
-RUN cd /home/Multiverse/multiverse_ws/src/multiverse_robots && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Robots.git && git checkout IROS-2023 && git pull origin IROS-2023
-RUN cd /home/Multiverse/multiverse_ws/src/multiverse_objects && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Objects.git && git checkout IROS-2023 && git pull origin IROS-2023
-RUN cd /home/Multiverse/multiverse_ws/src/multiverse_demos && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Demos.git && git checkout IROS-2023 && git pull origin IROS-2023
+RUN git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && git checkout main && git pull origin main
+RUN cd /home/Multiverse/multiverse_ws/src/multiverse_world && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-World.git && git checkout main && git pull origin main
+RUN cd /home/Multiverse/multiverse_ws/src/multiverse_robots && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Robots.git && git checkout main && git pull origin main
+RUN cd /home/Multiverse/multiverse_ws/src/multiverse_objects && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Objects.git && git checkout main && git pull origin main
+RUN cd /home/Multiverse/multiverse_ws/src/multiverse_demos && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Demos.git && git checkout main && git pull origin main
 
 # Copy packages
 COPY giskard_msgs /home/Multiverse/giskard_ws/src/giskard_msgs

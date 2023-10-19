@@ -1,11 +1,11 @@
-FROM multiverseframework/giskard:iros-2023
+FROM multiverseframework/giskard:ubuntu-20.04
 
-RUN git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && git checkout IROS-2023 && git pull origin IROS-2023
-RUN cd /home/Multiverse/multiverse_ws/src/multiverse_world && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-World.git && git checkout IROS-2023 && git pull origin IROS-2023
-RUN cd /home/Multiverse/multiverse_ws/src/multiverse_robots && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Robots.git && git checkout IROS-2023 && git pull origin IROS-2023
-RUN cd /home/Multiverse/multiverse_ws/src/multiverse_objects && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Objects.git && git checkout IROS-2023 && git pull origin IROS-2023
-RUN cd /home/Multiverse/multiverse_ws/src/multiverse_demos && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Demos.git && git checkout IROS-2023 && git pull origin IROS-2023
-RUN cd /home/Multiverse/giskard_ws/src/giskardpy && git remote set-url origin https://github.com/Multiverse-Framework/giskardpy.git && git checkout IROS-2023 && git pull origin IROS-2023
+RUN git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && git checkout main && git pull origin main
+RUN cd /home/Multiverse/multiverse_ws/src/multiverse_world && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-World.git && git checkout main && git pull origin main
+RUN cd /home/Multiverse/multiverse_ws/src/multiverse_robots && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Robots.git && git checkout main && git pull origin main
+RUN cd /home/Multiverse/multiverse_ws/src/multiverse_objects && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Objects.git && git checkout main && git pull origin main
+RUN cd /home/Multiverse/multiverse_ws/src/multiverse_demos && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Demos.git && git checkout main && git pull origin main
+RUN cd /home/Multiverse/giskard_ws/src/giskardpy && git remote set-url origin https://github.com/Multiverse-Framework/giskardpy.git && git checkout main && git pull origin main
 
 USER root
 ENV SHELL=/bin/bash
