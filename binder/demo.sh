@@ -3,20 +3,7 @@
 multiverse_server &
 
 source /home/Multiverse/multiverse_ws/devel/setup.bash && \
-  roslaunch tiago_dual_in_testbed mujoco.launch headless:=true &
-
-source /home/Multiverse/multiverse_ws/devel/setup.bash && \
-  roslaunch tiago_dual_in_testbed multiverse_socket.launch &
-
-source /home/Multiverse/giskard_ws/devel/setup.bash && \
-  roslaunch tiago_dual_control tiago_dual_giskard.launch &
-
-if [ "$DISPLAY" == ":99" ]; then
-  echo "No Display connected !!!"
-else
-  source /home/Multiverse/giskard_ws/devel/setup.bash && \
-    roslaunch tiago_dual_in_testbed rviz.launch &
-fi
+  roslaunch tiago_dual_in_testbed demo.launch headless:=true &
 
 source /home/Multiverse/giskard_ws/devel/setup.bash && \
   roslaunch rvizweb update_config.launch config_file:=/home/binder/rvizweb-config.json && \
