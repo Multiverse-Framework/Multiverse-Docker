@@ -33,7 +33,7 @@ services:
 
   multiverse-server-service:
     tty: true
-    image: multiverseframework/multiverse-server:ubuntu-20.04
+    image: multiverseframework/multiverse:ubuntu-20.04
     build:
       context: ./images/Multiverse-image/
       dockerfile: Dockerfile

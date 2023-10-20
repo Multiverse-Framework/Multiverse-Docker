@@ -1,5 +1,5 @@
 ARG ROS_DISTRO
-FROM multiverseframework/multiverse:noetic
+FROM multiverseframework/multiverse:ubuntu-20.04
 
 # Zero interaction while installing or upgrading the system via apt, see https://bobcares.com/blog/debian_frontendnoninteractive-docker/
 ARG DEBIAN_FRONTEND=noninteractive 
