@@ -38,7 +38,8 @@ RUN apt-get update && apt-get install -y \
   libxkbcommon-dev \
   libdbus-1-dev \
   linux-libc-dev \
-  pybind11-dev
+  pybind11-dev \
+  ros-${ROS_DISTRO}-tf
 
 # Install and link python3.8
 RUN apt-get install -y python3.8-dev && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 100
