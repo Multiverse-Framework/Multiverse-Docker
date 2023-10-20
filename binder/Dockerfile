@@ -5,7 +5,7 @@ RUN cd /home/Multiverse/multiverse_ws/src/multiverse_world && git remote set-url
 RUN cd /home/Multiverse/multiverse_ws/src/multiverse_robots && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Robots.git && git checkout main && git pull origin main
 RUN cd /home/Multiverse/multiverse_ws/src/multiverse_objects && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Objects.git && git checkout main && git pull origin main
 RUN cd /home/Multiverse/multiverse_ws/src/multiverse_demos && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Demos.git && git checkout main && git pull origin main
-RUN cd /home/Multiverse/giskard_ws/src/giskardpy && git remote set-url origin https://github.com/Multiverse-Framework/giskardpy.git && git checkout main && git pull origin main
+RUN cd /home/Multiverse/giskard_ws/src/giskardpy && git remote set-url origin https://github.com/Multiverse-Framework/giskardpy.git && git checkout devel && git pull origin devel
 
 USER root
 ENV SHELL=/bin/bash

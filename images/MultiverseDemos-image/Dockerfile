@@ -23,7 +23,8 @@ RUN apt-get update && apt-get install -y \
   ros-${ROS_DISTRO}-joint-state-publisher-gui \
   ros-${ROS_DISTRO}-effort-controllers \
   ros-${ROS_DISTRO}-gripper-action-controller \
-  ros-${ROS_DISTRO}-dwa-local-planner
+  ros-${ROS_DISTRO}-dwa-local-planner \
+  ros-${ROS_DISTRO}-cob-gazebo-objects
 
 RUN cd multiverse_ws && rosdep install --from-paths src --ignore-src -r -y && . /opt/ros/${ROS_DISTRO}/setup.sh && catkin build
 
