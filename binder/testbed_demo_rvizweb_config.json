@@ -2,20 +2,23 @@
   "globalOptions": {
     "background": "#d4e9f5",
     "colladaLoader": "collada2",
-    "fixedFrame": "/map"
+    "fixedFrame": "/map",
+    "url": "ws://localhost:8888/proxy/9090",
+    "colladaServer": "http://localhost:8888/proxy/8001",
+    "videoServer": "http://localhost:8888/proxy/9999"
   },
   "viewerOptions": {
     "camera": {
       "position": {
-        "x": 30,
-        "y": 2.5,
+        "x": 0,
+        "y": -10,
         "z": 10
       }
     },
     "cameraControls": {
       "center": {
-        "x": 10,
-        "y": 2.5,
+        "x": 0,
+        "y": 0,
         "z": 0
       }
     },
@@ -27,7 +30,7 @@
       }
     }
   },
-  "sidebarOpened": false,
+  "sidebarOpened": true,
   "displays": [
     {
       "isShown": true,
@@ -56,52 +59,18 @@
     },
     {
       "isShown": true,
-      "name": "Apartment model",
+      "name": "Testbed model",
       "options": {
-        "param": "apartment_description",
+        "param": "testbed_description",
         "tfPrefix": ""
       },
       "type": "urdf"
-    },
-    {
-      "isShown": true,
-      "name": "Ghost",
-      "options": {
-        "topic": "/giskard/visualization_marker_array"
-      },
-      "type": "markerArray"
     },
     {
       "isShown": true,
       "name": "Tiago model",
       "options": {
         "param": "robot_description",
-        "tfPrefix": ""
-      },
-      "type": "urdf"
-    },
-    {
-      "isShown": true,
-      "name": "Interactive Markers",
-      "options": {
-        "topic": "/eef_control"
-      },
-      "type": "interactiveMarkers"
-    },
-    {
-      "isShown": true,
-      "name": "Box model",
-      "options": {
-        "param": "box_description",
-        "tfPrefix": ""
-      },
-      "type": "urdf"
-    },
-    {
-      "isShown": true,
-      "name": "Milk box model",
-      "options": {
-        "param": "milk_box_description",
         "tfPrefix": ""
       },
       "type": "urdf"

@@ -1,5 +1,6 @@
 FROM multiverseframework/giskard:ubuntu-20.04
 
+# Update every workspace
 RUN git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && git checkout main && git pull origin main
 RUN cd /home/Multiverse/multiverse_ws/src/multiverse_world && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-World.git && git checkout main && git pull origin main
 RUN cd /home/Multiverse/multiverse_ws/src/multiverse_robots && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse-Robots.git && git checkout main && git pull origin main
@@ -46,16 +47,10 @@ RUN chown -R ${NB_UID} /home/Multiverse/giskard_ws
 
 # Copy necessary files
 COPY --chown=${NB_USER}:users binder /home/binder
-# COPY --chown=${NB_USER}:users binder/iros.jupyterlab-workspace /home/Multiverse/
-COPY --chown=${NB_USER}:users binder/demo.sh /home/Multiverse/
+COPY --chown=${NB_USER}:users binder/testbed_demo.jupyterlab-workspace /home/Multiverse/
+COPY --chown=${NB_USER}:users binder/testbed_demo.ipynb /home/Multiverse/testbed_demo.ipynb
 # Fix the mesh obj url in marker array
 COPY --chown=${NB_USER}:users binder/me /home/Multiverse/multiverse_ws/src/me
-
-# Update every workspace
-WORKDIR /home/Multiverse
-RUN git config --global --add safe.directory /home/Multiverse && \
-    git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && \
-    git pull origin main
 
 # Install ROS web tools under workspace multiverse_ws
 USER ${NB_USER}
@@ -82,4 +77,4 @@ RUN python3 -m bash_kernel.install
 
 USER ${NB_USER}
 WORKDIR /home/Multiverse
-ENTRYPOINT ["/home/binder/entrypoint.sh"]
+ENTRYPOINT ["/home/binder/testbed_demo_entrypoint.sh"]
