@@ -1,12 +1,3 @@
-images/Cram-image/pycram
-images/Cram-image/kdl_ik_services
-images/Giskard-image/giskard_msgs/
-images/Giskard-image/giskardpy/
 images/Multiverse-image/Multiverse/
-images/MultiverseCore-image/Multiverse/
-images/MultiverseDemos-image/multiverse_demos/
-images/MultiverseDemos-image/multiverse_objects/
-images/MultiverseDemos-image/multiverse_robots/
-images/MultiverseDemos-image/multiverse_world/
 UE-Packages
 *.vscode

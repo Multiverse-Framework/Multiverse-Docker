@@ -7,7 +7,7 @@ services:
       dockerfile: ./binder/Dockerfile
     tty: true
     stdin_open: true
-    entrypoint:  ["/home/binder/testbed_demo_entrypoint.sh"]
+    entrypoint:  ["/home/binder/entrypoint.sh"]
     command: jupyter lab --allow-root --NotebookApp.token='' --no-browser --ip=0.0.0.0
     # command: xvfb-run jupyter lab --allow-root --NotebookApp.token='' --no-browser --ip=0.0.0.0
     # user: root
