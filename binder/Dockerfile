@@ -48,6 +48,9 @@ COPY --chown=${NB_USER}:users binder /home/binder
 # Fix the mesh obj url in marker array
 COPY --chown=${NB_USER}:users binder/me /home/Multiverse/multiverse_ws/src/me
 
+# Fix the empy version
+RUN pip uninstall em && pip install empy==3.3.4
+
 # Install ROS web tools under workspace multiverse_ws
 USER ${NB_USER}
 WORKDIR /home/Multiverse/multiverse_ws/src
