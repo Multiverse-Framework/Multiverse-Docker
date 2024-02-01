@@ -98,7 +98,7 @@ RUN ./build_multiverse_ws.sh && ./build_multiverse_ws2.sh
 ENV PATH=${PATH}:/home/Multiverse/multiverse/bin
 ENV PYTHONPATH=${PYTHONPATH}:/home/Multiverse/multiverse/build/USD/lib/python:/home/Multiverse/multiverse/lib/libstdc++/python
 
-RUN RUN apt-get update && apt-get upgrade -y 
+RUN apt-get update && apt-get upgrade -y 
 
 # Install additional packages for ROS1
 RUN apt-get install -y \
