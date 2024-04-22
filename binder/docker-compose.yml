@@ -1,7 +1,7 @@
 version: '3.4'
 services:
   binderhub:
-    image: multiverseframework/binder:ubuntu-20.04
+    image: multiverseframework/binder:ECAI2024
     build:
       context: ../
       dockerfile: ./binder/Dockerfile

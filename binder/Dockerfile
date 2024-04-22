@@ -1,7 +1,7 @@
-FROM multiverseframework/multiverse:ubuntu-20.04
+FROM multiverseframework/multiverse:ECAI2024
 
 # Update every workspace
-RUN git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && git checkout main && git pull origin main
+# RUN git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && git checkout main && git pull origin main
 
 USER root
 ENV SHELL=/bin/bash

@@ -10,7 +10,7 @@ networks:
 services:
   multiverse-service:
     tty: true
-    image: multiverseframework/multiverse:ubuntu-20.04
+    image: multiverseframework/multiverse:ECAI2024
     build:
       context: ./images/Multiverse-image/
       dockerfile: Dockerfile

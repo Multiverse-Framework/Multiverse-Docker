@@ -34,6 +34,7 @@ RUN apt-get update && apt-get install -y \
     libglu1-mesa-dev \
     libxt-dev \
     git \
+    git-lfs \
     libjsoncpp-dev \
     libzmqpp-dev \
     build-essential \
@@ -76,7 +77,9 @@ RUN pip install \
     owlready2 \
     markupsafe==2.0.1 \
     jinja2 \
-    pybind11
+    pybind11 \
+    urdf_parser_py \
+    mujoco==3.1.4
 
 # Instal bash kernel
 RUN pip3 install panel jupyter-server bash_kernel
@@ -86,19 +89,92 @@ RUN python3 -m bash_kernel.install
 COPY Multiverse /home/Multiverse
 WORKDIR /home/Multiverse
 
-# Build the dependencies
-RUN ./build_third_parties.sh
+ARG MULTIVERSE_DIR=/home/Multiverse/multiverse
+ARG BIN_DIR=$MULTIVERSE_DIR/bin
+ARG EXT_DIR=$MULTIVERSE_DIR/external
+ARG BUILD_DIR=$MULTIVERSE_DIR/build
+ARG SRC_DIR=$MULTIVERSE_DIR/src
+ARG LIB_DIR=$MULTIVERSE_DIR/lib
+
+RUN mkdir -p $BIN_DIR
+RUN mkdir -p $BUILD_DIR
+
+# Build blender
+ARG BLENDER_BUILD_DIR=$BUILD_DIR/blender
+ARG BLENDER_EXT_DIR=$EXT_DIR/blender-git
+
+RUN mkdir -p $BLENDER_BUILD_DIR
+RUN cd $BLENDER_EXT_DIR/blender && ./build_files/utils/make_update.py --use-linux-libraries
+
+RUN sed -i \
+    -e 's/g->bitmap\[i\] = blf_glyph_gamma(glyph->bitmap.buffer\[i\] \* scale);/g->bitmap[i] = blf_glyph_gamma(char(glyph->bitmap.buffer[i] * scale));/' \
+    "$BLENDER_EXT_DIR/blender/source/blender/blenfont/intern/blf_glyph.cc"
+
+RUN sed -i \
+    -e 's/metrics->descender = metrics->ascender - metrics->units_per_EM;/metrics->descender = short(metrics->ascender - metrics->units_per_EM);/' \
+    "$BLENDER_EXT_DIR/blender/source/blender/blenfont/intern/blf_font.cc"
+
+RUN sed -i \
+    -e 's/direction += 1;/direction = short(direction + 1);/' \
+    -e 's/direction -= 1;/direction = short(direction - 1);/' \
+    "$BLENDER_EXT_DIR/blender/source/blender/editors/space_view3d/view3d_navigate_walk.cc"
+
+RUN sed -i \
+    -e 's/ = const_cast<const BMLoop \*(\*)\[3\]>(em->looptris);/;memcpy(corner_tris, em->looptris, sizeof(*em->looptris));/' \
+    "$BLENDER_EXT_DIR/blender/source/blender/blenkernel/intern/bvhutils.cc"
+
+RUN sed -i \
+    -e 's/mesh2tangent->looptris = const_cast<const BMLoop \*(\*)\[3\]>(em->looptris);/memcpy(mesh2tangent->looptris, em->looptris, sizeof(*em->looptris));/' \
+    "$BLENDER_EXT_DIR/blender/source/blender/blenkernel/intern/editmesh_tangent.cc"
+
+RUN sed -i \
+    -e 's/bmcb_data.looptris = const_cast<const BMLoop \*(\*)\[3\]>(bmtree->looptris);/const BMLoop *tmp_looptris[3] = {nullptr, nullptr, nullptr}; bmcb_data.looptris = \&tmp_looptris; memcpy(bmcb_data.looptris, bmtree->looptris, sizeof(*bmtree->looptris));/' \
+    -e 's/bmcb_data->looptris = const_cast<const BMLoop \*(\*)\[3\]>(bmtree->looptris);/const BMLoop *tmp_looptris[3] = {nullptr, nullptr, nullptr}; bmcb_data->looptris = \&tmp_looptris; memcpy(bmcb_data->looptris, bmtree->looptris, sizeof(*bmtree->looptris));/' \
+    "$BLENDER_EXT_DIR/blender/source/blender/blenkernel/intern/editmesh_bvh.cc"
+
+RUN cd $BLENDER_BUILD_DIR && cmake -S ../../external/blender-git/blender -B . -Wno-deprecated -Wno-dev && make -j$(nproc) && make install
+RUN cd $BLENDER_BUILD_DIR/bin/4.1/python/bin && ./python3.11 -m pip install --upgrade pip build --no-warn-script-location && ./python3.11 -m pip install bpy Pillow --no-warn-script-location
+RUN ln -sf $BLENDER_BUILD_DIR/bin/blender $BIN_DIR
+RUN ln -sf $BLENDER_BUILD_DIR/bin/4.1/python/bin/python3.11 $BIN_DIR
+
+# Build USD
+
+ARG USD_BUILD_DIR=$BUILD_DIR/USD
+ARG USD_EXT_DIR=$EXT_DIR/USD
+
+RUN mkdir -p $USD_BUILD_DIR
+
+RUN python3 $USD_EXT_DIR/build_scripts/build_usd.py $USD_BUILD_DIR
+RUN ln -sf $USD_BUILD_DIR/bin/usdview $BIN_DIR
+RUN ln -sf $USD_BUILD_DIR/bin/usdGenSchema $BIN_DIR
+RUN ln -sf $USD_BUILD_DIR/bin/usdcat $BIN_DIR
+
+# Build MuJoCo
+
+ARG MUJOCO_BUILD_DIR=$BUILD_DIR/mujoco
+ARG MUJOCO_EXT_DIR=$EXT_DIR/mujoco
+
+RUN mkdir -p $MUJOCO_BUILD_DIR
+
+RUN cd $MUJOCO_BUILD_DIR && cmake $MUJOCO_EXT_DIR -DCMAKE_INSTALL_PREFIX=$MUJOCO_BUILD_DIR -Wno-deprecated -Wno-dev && cmake --build . && cmake --install .
+RUN ln -sf $MUJOCO_BUILD_DIR/bin/simulate $BIN_DIR
+
+# Add PATH and PYTHONPATH
+ENV PATH=$PATH:$BIN_DIR
+ENV PYTHONPATH=$PYTHONPATH:$LIB_DIR/libstdc++/python:$USD_BUILD_DIR/lib/python
+
+RUN echo "export PATH=$PATH" >> ~/.bashrc
+RUN echo "export PYTHONPATH=$PYTHONPATH" >> ~/.bashrc
 
 # Build the software
-RUN ./build_multiverse.sh
+RUN cmake -S $MULTIVERSE_DIR -B $BUILD_DIR -DCMAKE_INSTALL_PREFIX:PATH=$MULTIVERSE_DIR -DMULTIVERSE_CLIENT_LIBRARY_TYPE=STATIC -DSTDLIB=libstdc++
+RUN make -C $BUILD_DIR
+RUN cmake --install $BUILD_DIR
 
 # Build the ROS workspace
 RUN ./build_multiverse_ws.sh && ./build_multiverse_ws2.sh
 
-ENV PATH=${PATH}:/home/Multiverse/multiverse/bin
-ENV PYTHONPATH=${PYTHONPATH}:/home/Multiverse/multiverse/build/USD/lib/python:/home/Multiverse/multiverse/lib/libstdc++/python
-
-RUN apt-get update && apt-get upgrade -y 
+RUN apt-get update && apt-get upgrade -y
 
 # Install additional packages for ROS1
 RUN apt-get install -y \
