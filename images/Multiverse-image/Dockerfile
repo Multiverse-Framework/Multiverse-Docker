@@ -52,6 +52,7 @@ RUN apt-get update && apt-get install -y \
     libxkbcommon-dev \
     libdbus-1-dev \
     linux-libc-dev \
+    libxcb-cursor0 \
     pybind11-dev
 
 # Install and link python3.8
@@ -59,6 +60,9 @@ RUN apt-get install -y python3.8-dev python3.8-venv && update-alternatives --ins
 
 # Install and link gcc-11
 RUN apt-get install -y gcc-11 && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100
+
+# Install and link g++-11
+RUN apt-get install -y g++-11 && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 100
 
 # Install and link clang-11
 RUN apt-get install -y clang-11 libc++-11-dev libstdc++-11-dev libc++abi-11-dev llvm-11-dev && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang-11 100
@@ -79,7 +83,8 @@ RUN pip install \
     jinja2 \
     pybind11 \
     urdf_parser_py \
-    mujoco==3.1.4
+    mujoco==3.1.4 \
+    scipy
 
 # Instal bash kernel
 RUN pip3 install panel jupyter-server bash_kernel
@@ -88,6 +93,8 @@ RUN python3 -m bash_kernel.install
 # Copy packages
 COPY Multiverse /home/Multiverse
 WORKDIR /home/Multiverse
+
+RUN git submodule update --init
 
 ARG MULTIVERSE_DIR=/home/Multiverse/multiverse
 ARG BIN_DIR=$MULTIVERSE_DIR/bin
@@ -105,33 +112,6 @@ ARG BLENDER_EXT_DIR=$EXT_DIR/blender-git
 
 RUN mkdir -p $BLENDER_BUILD_DIR
 RUN cd $BLENDER_EXT_DIR/blender && ./build_files/utils/make_update.py --use-linux-libraries
-
-RUN sed -i \
-    -e 's/g->bitmap\[i\] = blf_glyph_gamma(glyph->bitmap.buffer\[i\] \* scale);/g->bitmap[i] = blf_glyph_gamma(char(glyph->bitmap.buffer[i] * scale));/' \
-    "$BLENDER_EXT_DIR/blender/source/blender/blenfont/intern/blf_glyph.cc"
-
-RUN sed -i \
-    -e 's/metrics->descender = metrics->ascender - metrics->units_per_EM;/metrics->descender = short(metrics->ascender - metrics->units_per_EM);/' \
-    "$BLENDER_EXT_DIR/blender/source/blender/blenfont/intern/blf_font.cc"
-
-RUN sed -i \
-    -e 's/direction += 1;/direction = short(direction + 1);/' \
-    -e 's/direction -= 1;/direction = short(direction - 1);/' \
-    "$BLENDER_EXT_DIR/blender/source/blender/editors/space_view3d/view3d_navigate_walk.cc"
-
-RUN sed -i \
-    -e 's/ = const_cast<const BMLoop \*(\*)\[3\]>(em->looptris);/;memcpy(corner_tris, em->looptris, sizeof(*em->looptris));/' \
-    "$BLENDER_EXT_DIR/blender/source/blender/blenkernel/intern/bvhutils.cc"
-
-RUN sed -i \
-    -e 's/mesh2tangent->looptris = const_cast<const BMLoop \*(\*)\[3\]>(em->looptris);/memcpy(mesh2tangent->looptris, em->looptris, sizeof(*em->looptris));/' \
-    "$BLENDER_EXT_DIR/blender/source/blender/blenkernel/intern/editmesh_tangent.cc"
-
-RUN sed -i \
-    -e 's/bmcb_data.looptris = const_cast<const BMLoop \*(\*)\[3\]>(bmtree->looptris);/const BMLoop *tmp_looptris[3] = {nullptr, nullptr, nullptr}; bmcb_data.looptris = \&tmp_looptris; memcpy(bmcb_data.looptris, bmtree->looptris, sizeof(*bmtree->looptris));/' \
-    -e 's/bmcb_data->looptris = const_cast<const BMLoop \*(\*)\[3\]>(bmtree->looptris);/const BMLoop *tmp_looptris[3] = {nullptr, nullptr, nullptr}; bmcb_data->looptris = \&tmp_looptris; memcpy(bmcb_data->looptris, bmtree->looptris, sizeof(*bmtree->looptris));/' \
-    "$BLENDER_EXT_DIR/blender/source/blender/blenkernel/intern/editmesh_bvh.cc"
-
 RUN cd $BLENDER_BUILD_DIR && cmake -S ../../external/blender-git/blender -B . -Wno-deprecated -Wno-dev && make -j$(nproc) && make install
 RUN cd $BLENDER_BUILD_DIR/bin/4.1/python/bin && ./python3.11 -m pip install --upgrade pip build --no-warn-script-location && ./python3.11 -m pip install bpy Pillow --no-warn-script-location
 RUN ln -sf $BLENDER_BUILD_DIR/bin/blender $BIN_DIR
@@ -167,6 +147,10 @@ RUN echo "export PATH=$PATH" >> ~/.bashrc
 RUN echo "export PYTHONPATH=$PYTHONPATH" >> ~/.bashrc
 
 # Build the software
+
+# Fix g++ for pybind11
+RUN update-alternatives --remove g++ /usr/bin/g++-11 && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100 
+
 RUN cmake -S $MULTIVERSE_DIR -B $BUILD_DIR -DCMAKE_INSTALL_PREFIX:PATH=$MULTIVERSE_DIR -DMULTIVERSE_CLIENT_LIBRARY_TYPE=STATIC -DSTDLIB=libstdc++
 RUN make -C $BUILD_DIR
 RUN cmake --install $BUILD_DIR

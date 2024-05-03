@@ -1,5 +1,3 @@
-version: '3.4'
-
 networks:
   ros-network:
     driver: bridge
@@ -10,8 +8,18 @@ networks:
 services:
   multiverse-service:
     tty: true
-    image: multiverseframework/multiverse:ECAI2024
+    image: multiverseframework/multiverse:ubuntu-20.04
     build:
       context: ./images/Multiverse-image/
       dockerfile: Dockerfile
     container_name: multiverse-container
+
+  multiverse-tutorials-service:
+    tty: true
+    image: multiverseframework/multiverse-tutorials:ubuntu-20.04
+    build:
+      context: ./images/Multiverse-Tutorials-image/
+      dockerfile: Dockerfile
+    container_name: multiverse-tutorials-container
+    depends_on:
+      - multiverse-service

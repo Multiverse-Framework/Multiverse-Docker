@@ -1,4 +1,4 @@
-FROM multiverseframework/multiverse:ECAI2024
+FROM multiverseframework/multiverse-tutorials:ubuntu-20.04
 
 # Update every workspace
 # RUN git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && git checkout main && git pull origin main
@@ -34,13 +34,15 @@ RUN pip install --no-cache-dir --ignore-installed notebook==6.4.12 jupyterlab==3
     https://raw.githubusercontent.com/yxzhan/jupyterlab-rviz/master/dist/jupyterlab_rviz-0.3.1.tar.gz
 
 # Allow user ${NB_USER} write some directories
-WORKDIR /home/Multiverse
 RUN chown -R ${NB_UID} /tmp
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse/modules/multiverse_knowledge/Konclude
-RUN chown -R ${NB_UID} /home/Multiverse/multiverse/resources
-RUN chown -R ${NB_UID} /home/Multiverse/multiverse/saved
+RUN chown -R ${NB_UID} /home/Multiverse/multiverse/modules/multiverse_connectors/scripts/utils/config
+# RUN chown -R ${NB_UID} /home/Multiverse/multiverse/resources
+# RUN chown -R ${NB_UID} /home/Multiverse/multiverse/saved
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws2
+RUN chown -R ${NB_UID} /home/Multiverse-Tutorials/resources
+RUN mkdir /home/Multiverse-Tutorials/output && chown -R ${NB_UID} /home/Multiverse-Tutorials/output
 
 # Copy necessary files
 COPY --chown=${NB_USER}:users binder /home/binder
@@ -71,5 +73,5 @@ RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/
 COPY --chown=${NB_USER}:users binder/jupyter-settings.json /usr/local/share/jupyter/lab/settings/overrides.json
 
 USER ${NB_USER}
-WORKDIR /home/Multiverse
+WORKDIR /home/Multiverse-Tutorials
 ENTRYPOINT ["/home/binder/entrypoint.sh"]

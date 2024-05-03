@@ -1,3 +1,5 @@
-images/Multiverse-image/Multiverse/
 UE-Packages
 *.vscode
+images
+
+!*/Dockerfile
