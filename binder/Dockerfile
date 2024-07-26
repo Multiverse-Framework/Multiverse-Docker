@@ -1,7 +1,7 @@
 FROM multiverseframework/multiverse-tutorials:ubuntu-20.04
 
 # Update every workspace
-# RUN git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && git checkout main && git pull origin main
+RUN cd ../Multiverse && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && git checkout main && git pull origin main
 
 USER root
 ENV SHELL=/bin/bash
@@ -42,8 +42,14 @@ RUN chown -R ${NB_UID} /home/Multiverse/multiverse/modules/multiverse_connectors
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws2
 RUN chown -R ${NB_UID} /home/Multiverse-Tutorials/resources
-RUN chown -R ${NB_UID} /root/.virtualenvs
 RUN mkdir /home/Multiverse-Tutorials/output && chown -R ${NB_UID} /home/Multiverse-Tutorials/output
+
+ARG MULTIVERSE_DIR=/home/Multiverse/multiverse
+ARG BUILD_DIR=$MULTIVERSE_DIR/build
+RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; mkvirtualenv --system-site-packages multiverse"
+RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; workon multiverse; pip install pyside6 pyopengl pyside6 wheel cython owlready2 markupsafe==2.0.1 jinja2 pybind11 urdf_parser_py mujoco==3.2.0 scipy panel jupyter-server bash_kernel; python -m bash_kernel.install; cmake -S $MULTIVERSE_DIR -B $BUILD_DIR -DCMAKE_INSTALL_PREFIX:PATH=$MULTIVERSE_DIR -DMULTIVERSE_CLIENT_LIBRARY_TYPE=STATIC -DSTDLIB=libstdc++"
+RUN make -C $BUILD_DIR
+RUN cmake --install $BUILD_DIR
 
 # Copy necessary files
 COPY --chown=${NB_USER}:users binder /home/binder
@@ -72,6 +78,9 @@ RUN catkin build
 RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)" --unattended && \
     sed -i 's/OSH_THEME="font"/OSH_THEME="half-life"/' /home/${NB_USER}/.bashrc
 COPY --chown=${NB_USER}:users binder/jupyter-settings.json /usr/local/share/jupyter/lab/settings/overrides.json
+
+RUN echo "export PYTHONPATH=$PYTHONPATH:$MULTIVERSE_DIR/lib/dist-packages" >> ~/.bashrc
+RUN echo "source /usr/local/bin/virtualenvwrapper.sh && workon multiverse" >> ~/.bashrc
 
 USER ${NB_USER}
 WORKDIR /home/Multiverse-Tutorials

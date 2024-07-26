@@ -86,7 +86,7 @@ RUN /root/.virtualenvs/multiverse/bin/python -m pip install \
     jinja2 \
     pybind11 \
     urdf_parser_py \
-    mujoco==3.2 \
+    mujoco==3.2.0 \
     scipy
 
 # Instal bash kernel
