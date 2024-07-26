@@ -42,6 +42,7 @@ RUN chown -R ${NB_UID} /home/Multiverse/multiverse/modules/multiverse_connectors
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws2
 RUN chown -R ${NB_UID} /home/Multiverse-Tutorials/resources
+RUN chown -R ${NB_UID} /root/.virtualenvs
 RUN mkdir /home/Multiverse-Tutorials/output && chown -R ${NB_UID} /home/Multiverse-Tutorials/output
 
 # Copy necessary files

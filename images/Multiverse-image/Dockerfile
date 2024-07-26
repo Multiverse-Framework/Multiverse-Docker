@@ -73,7 +73,10 @@ RUN apt-get install -y python3-rosdep && rosdep init && rosdep fix-permissions &
 # Install pip
 RUN apt-get install -y python3-pip && pip install --upgrade pip build
 
-RUN pip install \
+RUN pip install virtualenvwrapper
+RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh && mkvirtualenv --system-site-packages multiverse"
+
+RUN /root/.virtualenvs/multiverse/bin/python -m pip install \
     pyside6 \
     pyopengl \
     wheel \
@@ -83,12 +86,12 @@ RUN pip install \
     jinja2 \
     pybind11 \
     urdf_parser_py \
-    mujoco==3.1.4 \
+    mujoco==3.2 \
     scipy
 
 # Instal bash kernel
-RUN pip3 install panel jupyter-server bash_kernel
-RUN python3 -m bash_kernel.install
+RUN /root/.virtualenvs/multiverse/bin/python -m pip install panel jupyter-server bash_kernel
+RUN /root/.virtualenvs/multiverse/bin/python -m bash_kernel.install
 
 # Copy packages
 COPY Multiverse /home/Multiverse
@@ -124,7 +127,7 @@ ARG USD_EXT_DIR=$EXT_DIR/USD
 
 RUN mkdir -p $USD_BUILD_DIR
 
-RUN python3 $USD_EXT_DIR/build_scripts/build_usd.py $USD_BUILD_DIR
+RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh && workon multiverse && python $USD_EXT_DIR/build_scripts/build_usd.py $USD_BUILD_DIR"
 RUN ln -sf $USD_BUILD_DIR/bin/usdview $BIN_DIR
 RUN ln -sf $USD_BUILD_DIR/bin/usdGenSchema $BIN_DIR
 RUN ln -sf $USD_BUILD_DIR/bin/usdcat $BIN_DIR
@@ -141,7 +144,7 @@ RUN ln -sf $MUJOCO_BUILD_DIR/bin/simulate $BIN_DIR
 
 # Add PATH and PYTHONPATH
 ENV PATH=$PATH:$BIN_DIR
-ENV PYTHONPATH=$PYTHONPATH:$LIB_DIR/libstdc++/python:$USD_BUILD_DIR/lib/python
+ENV PYTHONPATH=$LIB_DIR/libstdc++/python:$USD_BUILD_DIR/lib/python
 
 RUN echo "export PATH=$PATH" >> ~/.bashrc
 RUN echo "export PYTHONPATH=$PYTHONPATH" >> ~/.bashrc
@@ -151,7 +154,7 @@ RUN echo "export PYTHONPATH=$PYTHONPATH" >> ~/.bashrc
 # Fix g++ for pybind11
 RUN update-alternatives --remove g++ /usr/bin/g++-11 && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100 
 
-RUN cmake -S $MULTIVERSE_DIR -B $BUILD_DIR -DCMAKE_INSTALL_PREFIX:PATH=$MULTIVERSE_DIR -DMULTIVERSE_CLIENT_LIBRARY_TYPE=STATIC -DSTDLIB=libstdc++
+RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh && workon multiverse && cmake -S $MULTIVERSE_DIR -B $BUILD_DIR -DCMAKE_INSTALL_PREFIX:PATH=$MULTIVERSE_DIR -DMULTIVERSE_CLIENT_LIBRARY_TYPE=STATIC -DSTDLIB=libstdc++"
 RUN make -C $BUILD_DIR
 RUN cmake --install $BUILD_DIR
 
@@ -190,3 +193,6 @@ RUN apt-get install -y \
     ros-foxy-velocity-controllers \
     ros-foxy-effort-controllers \
     ros-foxy-gripper-controllers
+
+RUN echo "export PYTHONPATH=$PYTHONPATH:$MULTIVERSE_DIR/lib/dist-packages" >> ~/.bashrc
+RUN echo "source /usr/local/bin/virtualenvwrapper.sh && workon multiverse" >> ~/.bashrc
