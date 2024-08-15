@@ -196,3 +196,49 @@ RUN apt-get install -y \
 
 RUN echo "export PYTHONPATH=$PYTHONPATH:$MULTIVERSE_DIR/lib/dist-packages" >> ~/.bashrc
 RUN echo "source /usr/local/bin/virtualenvwrapper.sh && workon multiverse" >> ~/.bashrc
+
+# --- Install VNC server and XFCE desktop environment --- #
+USER root
+RUN apt-get -y -qq update && apt-get -y -qq install \
+    dbus-x11 \
+    firefox \
+    xfce4 \
+    xfce4-panel \
+    xfce4-session \
+    xfce4-settings \
+    xorg \
+    gnome-shell \
+    gnome-session \
+    gnome-terminal \
+    xubuntu-icon-theme \
+    fonts-dejavu \
+    # Disable the automatic screenlock since the account password is unknown
+    && apt-get -y -qq remove xfce4-screensaver \
+    # chown $HOME to workaround that the xorg installation creates a
+    # /home/jovyan/.cache directory owned by root
+    # Create /opt/install to ensure it's writable by pip
+    && mkdir -p /opt/install \
+    && chown -R $NB_UID:$NB_GID $HOME /opt/install
+
+# Install a VNC server, either TigerVNC (default) or TurboVNC
+ENV PATH=/opt/TurboVNC/bin:$PATH
+RUN echo "Installing TurboVNC"; \
+    # Install instructions from https://turbovnc.org/Downloads/YUM
+    wget -q -O- https://packagecloud.io/dcommander/turbovnc/gpgkey | \
+    gpg --dearmor >/etc/apt/trusted.gpg.d/TurboVNC.gpg; \
+    wget -O /etc/apt/sources.list.d/TurboVNC.list https://raw.githubusercontent.com/TurboVNC/repo/main/TurboVNC.list; \
+    apt-get -y -qq update; \
+    apt-get -y -qq install \
+    turbovnc
+
+# Install conda
+RUN mkdir -p ~/miniconda3; \
+    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh; \
+    bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3; \
+    ~/miniconda3/bin/conda init bash; \
+    ~/miniconda3/bin/conda init zsh
+
+RUN ~/miniconda3/bin/conda update --all
+RUN ~/miniconda3/bin/conda install -c conda-forge websockify
+RUN pip install websockify jupyter-remote-desktop-proxy
+ENV DISPLAY=:1
