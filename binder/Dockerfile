@@ -6,17 +6,6 @@ RUN cd ../Multiverse && git remote set-url origin https://github.com/Multiverse-
 USER root
 ENV SHELL=/bin/bash
 
-# Create non-root user jovyan
-ENV NB_USER=jovyan
-ENV NB_UID=1000
-ENV USER ${NB_USER}
-ENV NB_UID ${NB_UID}
-ENV HOME /home/${NB_USER}
-RUN adduser --disabled-password \
-    --gecos "Default user" \
-    --uid ${NB_UID} \
-    ${NB_USER}
-
 # Install apt packages
 RUN apt-get update && apt-get install -y curl vim xvfb htop ros-noetic-tf2-tools ros-noetic-rosbridge-suite ros-noetic-roswww ros-noetic-tf2-web-republisher
 # Install nodejs (dependency of Jupyterlab extensions)
@@ -37,8 +26,8 @@ RUN pip install --no-cache-dir --ignore-installed notebook==6.4.12 jupyterlab==3
 RUN chown -R ${NB_UID} /tmp
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse/modules/multiverse_knowledge/Konclude
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse/modules/multiverse_connectors/scripts/utils/config
-# RUN chown -R ${NB_UID} /home/Multiverse/multiverse/resources
-# RUN chown -R ${NB_UID} /home/Multiverse/multiverse/saved
+RUN chown -R ${NB_UID} /home/Multiverse/multiverse/resources
+RUN chown -R ${NB_UID} /home/Multiverse/multiverse/saved
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws2
 RUN chown -R ${NB_UID} /home/Multiverse-Tutorials/resources
@@ -47,9 +36,10 @@ RUN mkdir /home/Multiverse-Tutorials/output && chown -R ${NB_UID} /home/Multiver
 ARG MULTIVERSE_DIR=/home/Multiverse/multiverse
 ARG BUILD_DIR=$MULTIVERSE_DIR/build
 RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; mkvirtualenv --system-site-packages multiverse"
-RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; workon multiverse; pip install pyside6 pyopengl pyside6 wheel cython owlready2 markupsafe==2.0.1 jinja2 pybind11 urdf_parser_py mujoco==3.2.0 scipy panel jupyter-server bash_kernel; python -m bash_kernel.install; cmake -S $MULTIVERSE_DIR -B $BUILD_DIR -DCMAKE_INSTALL_PREFIX:PATH=$MULTIVERSE_DIR -DMULTIVERSE_CLIENT_LIBRARY_TYPE=STATIC -DSTDLIB=libstdc++"
-RUN make -C $BUILD_DIR
-RUN cmake --install $BUILD_DIR
+RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; workon multiverse; pip install pyside6 pyopengl pyside6 wheel cython owlready2 markupsafe==2.0.1 jinja2 pybind11 urdf_parser_py mujoco==3.2.0 scipy panel jupyter-server bash_kernel; python -m bash_kernel.install"
+RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; workon multiverse; cmake -S $MULTIVERSE_DIR -B $BUILD_DIR -DCMAKE_INSTALL_PREFIX:PATH=$MULTIVERSE_DIR -DMULTIVERSE_CLIENT_LIBRARY_TYPE=STATIC -DSTDLIB=libstdc++"
+RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; workon multiverse; make -C $BUILD_DIR"
+RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; workon multiverse; cmake --install $BUILD_DIR"
 
 # Copy necessary files
 COPY --chown=${NB_USER}:users binder /home/binder
@@ -58,7 +48,7 @@ COPY --chown=${NB_USER}:users binder /home/binder
 COPY --chown=${NB_USER}:users binder/me /home/Multiverse/multiverse_ws/src/me
 
 # Fix the empy version
-RUN pip uninstall em && pip install empy==3.3.4
+# RUN pip uninstall em && pip install empy==3.3.4
 
 # Install ROS web tools under workspace multiverse_ws
 USER ${NB_USER}
@@ -72,7 +62,7 @@ RUN apt update && rosdep install -y --ignore-src --from-paths ./ -r
 RUN chown -R ${NB_UID} /home/${NB_USER} && \
     chown  ${NB_UID} /home/Multiverse
 USER ${NB_USER}
-RUN catkin build
+RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; workon multiverse; catkin build"
 
 # Install OH-My-Bash
 RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)" --unattended && \

@@ -1,4 +1,6 @@
-FROM ubuntu:20.04
+FROM jupyter/minimal-notebook:ubuntu-20.04
+
+USER root
 
 # Zero interaction while installing or upgrading the system via apt, see https://bobcares.com/blog/debian_frontendnoninteractive-docker/
 ENV DEBIAN_FRONTEND=noninteractive
@@ -71,12 +73,15 @@ RUN apt-get install -y clang-11 libc++-11-dev libstdc++-11-dev libc++abi-11-dev 
 RUN apt-get install -y python3-rosdep && rosdep init && rosdep fix-permissions && rosdep update
 
 # Install pip
-RUN apt-get install -y python3-pip && pip install --upgrade pip build
+RUN apt-get install -y python3-pip && python3.8 -m pip install --upgrade pip build
 
-RUN pip install virtualenvwrapper
-RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh && mkvirtualenv --system-site-packages multiverse"
+# Install virtualenvwrapper
+ENV VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.8
+RUN python3.8 -m pip install virtualenvwrapper
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh) && mkvirtualenv --system-site-packages multiverse"
 
-RUN /root/.virtualenvs/multiverse/bin/python -m pip install \
+RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m pip install --upgrade pip
+RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m pip install \
     pyside6 \
     pyopengl \
     wheel \
@@ -87,11 +92,12 @@ RUN /root/.virtualenvs/multiverse/bin/python -m pip install \
     pybind11 \
     urdf_parser_py \
     mujoco==3.2.0 \
-    scipy
+    scipy \
+    cmake
 
 # Instal bash kernel
-RUN /root/.virtualenvs/multiverse/bin/python -m pip install panel jupyter-server bash_kernel
-RUN /root/.virtualenvs/multiverse/bin/python -m bash_kernel.install
+RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m pip install panel jupyter-server bash_kernel
+RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m bash_kernel.install
 
 # Copy packages
 COPY Multiverse /home/Multiverse
@@ -127,7 +133,7 @@ ARG USD_EXT_DIR=$EXT_DIR/USD
 
 RUN mkdir -p $USD_BUILD_DIR
 
-RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh && workon multiverse && python $USD_EXT_DIR/build_scripts/build_usd.py $USD_BUILD_DIR"
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; python3.8 $USD_EXT_DIR/build_scripts/build_usd.py $USD_BUILD_DIR"
 RUN ln -sf $USD_BUILD_DIR/bin/usdview $BIN_DIR
 RUN ln -sf $USD_BUILD_DIR/bin/usdGenSchema $BIN_DIR
 RUN ln -sf $USD_BUILD_DIR/bin/usdcat $BIN_DIR
@@ -154,12 +160,10 @@ RUN echo "export PYTHONPATH=$PYTHONPATH" >> ~/.bashrc
 # Fix g++ for pybind11
 RUN update-alternatives --remove g++ /usr/bin/g++-11 && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100 
 
-RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh && workon multiverse && cmake -S $MULTIVERSE_DIR -B $BUILD_DIR -DCMAKE_INSTALL_PREFIX:PATH=$MULTIVERSE_DIR -DMULTIVERSE_CLIENT_LIBRARY_TYPE=STATIC -DSTDLIB=libstdc++"
-RUN make -C $BUILD_DIR
-RUN cmake --install $BUILD_DIR
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; ./build_multiverse.sh"
 
 # Build the ROS workspace
-RUN ./build_multiverse_ws.sh && ./build_multiverse_ws2.sh
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; ./build_multiverse_ws.sh; ./build_multiverse_ws2.sh"
 
 RUN apt-get update && apt-get upgrade -y
 
@@ -231,14 +235,6 @@ RUN echo "Installing TurboVNC"; \
     apt-get -y -qq install \
     turbovnc
 
-# Install conda
-RUN mkdir -p ~/miniconda3; \
-    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh; \
-    bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3; \
-    ~/miniconda3/bin/conda init bash; \
-    ~/miniconda3/bin/conda init zsh
-
-RUN ~/miniconda3/bin/conda update --all
-RUN ~/miniconda3/bin/conda install -c conda-forge websockify
-RUN pip install websockify jupyter-remote-desktop-proxy
+RUN conda install -y websockify
+RUN pip install jupyter-remote-desktop-proxy jupyterlab
 ENV DISPLAY=:1
