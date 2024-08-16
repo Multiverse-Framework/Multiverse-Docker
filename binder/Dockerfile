@@ -1,4 +1,4 @@
-FROM multiverseframework/multiverse-tutorials:ubuntu-20.04
+FROM multiverseframework/multivers:ubuntu-20.04
 
 # Update every workspace
 RUN cd ../Multiverse && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && git checkout main && git pull origin main
@@ -31,8 +31,8 @@ RUN pip install --no-cache-dir --ignore-installed notebook==6.4.12 jupyterlab==3
     jupyter-server-proxy jupyterlab-git jlab-enhanced-cell-toolbar \
     autobahn gnupg twisted cbor2 empy ipywidgets  \
     pymongo Pillow pycryptodomex simplejpeg tqdm \
-    https://raw.githubusercontent.com/yxzhan/jupyterlab-rviz/master/dist/jupyterlab_rviz-0.3.1.tar.gz
-RUN pip uninstall em && pip install empy==3.3.4
+    https://raw.githubusercontent.com/yxzhan/jupyterlab-rviz/master/dist/jupyterlab_rviz-0.3.1.tar.gz \
+    empy==3.3.4
 
 # Allow user ${NB_USER} write some directories
 RUN chown -R ${NB_UID} /tmp
