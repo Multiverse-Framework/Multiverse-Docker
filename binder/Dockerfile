@@ -32,6 +32,7 @@ RUN pip install --no-cache-dir --ignore-installed notebook==6.4.12 jupyterlab==3
     autobahn gnupg twisted cbor2 empy ipywidgets  \
     pymongo Pillow pycryptodomex simplejpeg tqdm \
     https://raw.githubusercontent.com/yxzhan/jupyterlab-rviz/master/dist/jupyterlab_rviz-0.3.1.tar.gz
+RUN pip uninstall em && pip install empy==3.3.4
 
 # Allow user ${NB_USER} write some directories
 RUN chown -R ${NB_UID} /tmp
@@ -57,9 +58,6 @@ COPY --chown=${NB_USER}:users binder /home/binder
 
 # Fix the mesh obj url in marker array
 COPY --chown=${NB_USER}:users binder/me /home/Multiverse/multiverse_ws/src/me
-
-# Fix the empy version
-# RUN pip uninstall em && pip install empy==3.3.4
 
 # Install ROS web tools under workspace multiverse_ws
 USER ${NB_USER}
