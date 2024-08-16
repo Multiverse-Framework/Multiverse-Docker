@@ -6,6 +6,13 @@ RUN cd ../Multiverse && git remote set-url origin https://github.com/Multiverse-
 USER root
 ENV SHELL=/bin/bash
 
+# Set non-root user jovyan
+ENV NB_USER=jovyan
+ENV NB_UID=1000
+ENV USER ${NB_USER}
+ENV NB_UID ${NB_UID}
+ENV HOME /home/${NB_USER}
+
 # Install apt packages
 RUN apt-get update && apt-get install -y curl vim xvfb htop ros-noetic-tf2-tools ros-noetic-rosbridge-suite ros-noetic-roswww ros-noetic-tf2-web-republisher
 # Install nodejs (dependency of Jupyterlab extensions)
