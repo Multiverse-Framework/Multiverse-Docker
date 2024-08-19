@@ -141,8 +141,8 @@ RUN cd $BLENDER_BUILD_DIR/4.2/python/bin && ./python3.11 -m pip install --upgrad
 # RUN cd $BLENDER_BUILD_DIR && cmake -S ../../external/blender-git/blender -B . -Wno-deprecated -Wno-dev && make -j$(nproc) && make install
 # RUN cd $BLENDER_BUILD_DIR/bin/4.1/python/bin && ./python3.11 -m pip install --upgrade pip build --no-warn-script-location && ./python3.11 -m pip install bpy Pillow --no-warn-script-location
 
-RUN ln -sf $BLENDER_BUILD_DIR/bin/blender $BIN_DIR
-RUN ln -sf $BLENDER_BUILD_DIR/bin/4.1/python/bin/python3.11 $BIN_DIR
+RUN ln -sf $BLENDER_BUILD_DIR/blender $BIN_DIR
+RUN ln -sf $BLENDER_BUILD_DIR/4.2/python/bin/python3.11 $BIN_DIR
 
 # Build MuJoCo
 
