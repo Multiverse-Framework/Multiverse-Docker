@@ -103,8 +103,6 @@ RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m bash_kernel.install
 COPY Multiverse /home/Multiverse
 WORKDIR /home/Multiverse
 
-RUN git submodule update --init
-
 ARG MULTIVERSE_DIR=/home/Multiverse/multiverse
 ARG BIN_DIR=$MULTIVERSE_DIR/bin
 ARG EXT_DIR=$MULTIVERSE_DIR/external
@@ -112,19 +110,10 @@ ARG BUILD_DIR=$MULTIVERSE_DIR/build
 ARG SRC_DIR=$MULTIVERSE_DIR/src
 ARG LIB_DIR=$MULTIVERSE_DIR/lib
 
+RUN git submodule update --init $MULTIVERSE_DIR/modules/multiverse_knowledge
+
 RUN mkdir -p $BIN_DIR
 RUN mkdir -p $BUILD_DIR
-
-# Build blender
-ARG BLENDER_BUILD_DIR=$BUILD_DIR/blender
-ARG BLENDER_EXT_DIR=$EXT_DIR/blender-git
-
-RUN mkdir -p $BLENDER_BUILD_DIR
-RUN cd $BLENDER_EXT_DIR/blender && ./build_files/utils/make_update.py --use-linux-libraries
-RUN cd $BLENDER_BUILD_DIR && cmake -S ../../external/blender-git/blender -B . -Wno-deprecated -Wno-dev && make -j$(nproc) && make install
-RUN cd $BLENDER_BUILD_DIR/bin/4.1/python/bin && ./python3.11 -m pip install --upgrade pip build --no-warn-script-location && ./python3.11 -m pip install bpy Pillow --no-warn-script-location
-RUN ln -sf $BLENDER_BUILD_DIR/bin/blender $BIN_DIR
-RUN ln -sf $BLENDER_BUILD_DIR/bin/4.1/python/bin/python3.11 $BIN_DIR
 
 # Build USD
 
@@ -138,14 +127,33 @@ RUN ln -sf $USD_BUILD_DIR/bin/usdview $BIN_DIR
 RUN ln -sf $USD_BUILD_DIR/bin/usdGenSchema $BIN_DIR
 RUN ln -sf $USD_BUILD_DIR/bin/usdcat $BIN_DIR
 
+# Build blender
+ARG BLENDER_BUILD_DIR=$BUILD_DIR/blender
+RUN mkdir -p $BLENDER_BUILD_DIR
+
+ARG BLENDER_TAR_FILE=blender-4.2.0-linux-x64.tar.xz
+RUN curl -o $EXT_DIR/$BLENDER_TAR_FILE https://download.blender.org/release/Blender4.2/$BLENDER_TAR_FILE; tar xf $EXT_DIR/$BLENDER_TAR_FILE -C $BLENDER_BUILD_DIR --strip-components=1
+RUN cd $BLENDER_BUILD_DIR/4.2/python/bin && ./python3.11 -m pip install --upgrade pip build --no-warn-script-location && ./python3.11 -m pip install bpy Pillow --no-warn-script-location
+
+# ARG BLENDER_EXT_DIR=$EXT_DIR/blender-git
+# RUN cd $BLENDER_EXT_DIR/blender && ./build_files/utils/make_update.py --use-linux-libraries
+# RUN cd $BLENDER_BUILD_DIR && cmake -S ../../external/blender-git/blender -B . -Wno-deprecated -Wno-dev && make -j$(nproc) && make install
+# RUN cd $BLENDER_BUILD_DIR/bin/4.1/python/bin && ./python3.11 -m pip install --upgrade pip build --no-warn-script-location && ./python3.11 -m pip install bpy Pillow --no-warn-script-location
+
+RUN ln -sf $BLENDER_BUILD_DIR/bin/blender $BIN_DIR
+RUN ln -sf $BLENDER_BUILD_DIR/bin/4.1/python/bin/python3.11 $BIN_DIR
+
 # Build MuJoCo
 
 ARG MUJOCO_BUILD_DIR=$BUILD_DIR/mujoco
-ARG MUJOCO_EXT_DIR=$EXT_DIR/mujoco
-
 RUN mkdir -p $MUJOCO_BUILD_DIR
 
-RUN cd $MUJOCO_BUILD_DIR && cmake $MUJOCO_EXT_DIR -DCMAKE_INSTALL_PREFIX=$MUJOCO_BUILD_DIR -Wno-deprecated -Wno-dev && cmake --build . && cmake --install .
+ARG MUJOCO_TAR_FILE=mujoco-3.2.2-linux-x86_64.tar.gz
+RUN curl -sL https://github.com/google-deepmind/mujoco/releases/download/3.2.2/$MUJOCO_TAR_FILE | tar zx -C $MUJOCO_BUILD_DIR --strip-components=1
+
+# ARG MUJOCO_EXT_DIR=$EXT_DIR/mujoco
+# RUN  mkdir -p $MUJOCO_BUILD_DIR; cd $MUJOCO_BUILD_DIR && cmake $MUJOCO_EXT_DIR -DCMAKE_INSTALL_PREFIX=$MUJOCO_BUILD_DIR -Wno-deprecated -Wno-dev && cmake --build . && cmake --install .
+
 RUN ln -sf $MUJOCO_BUILD_DIR/bin/simulate $BIN_DIR
 
 # Add PATH and PYTHONPATH
