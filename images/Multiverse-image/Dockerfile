@@ -122,6 +122,7 @@ ARG USD_EXT_DIR=$EXT_DIR/USD
 
 RUN mkdir -p $USD_BUILD_DIR
 
+RUN git submodule update --init $USD_EXT_DIR
 RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; python3.8 $USD_EXT_DIR/build_scripts/build_usd.py $USD_BUILD_DIR"
 RUN ln -sf $USD_BUILD_DIR/bin/usdview $BIN_DIR
 RUN ln -sf $USD_BUILD_DIR/bin/usdGenSchema $BIN_DIR
