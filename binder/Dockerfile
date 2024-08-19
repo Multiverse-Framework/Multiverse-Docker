@@ -56,9 +56,6 @@ RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; workon multiverse;
 # Copy necessary files
 COPY --chown=${NB_USER}:users binder /home/binder
 
-# Fix the mesh obj url in marker array
-COPY --chown=${NB_USER}:users binder/me /home/Multiverse/multiverse_ws/src/me
-
 # Install ROS web tools under workspace multiverse_ws
 USER ${NB_USER}
 WORKDIR /home/Multiverse/multiverse_ws/src
