@@ -6,14 +6,6 @@ networks:
         - subnet: ${SUBNET}
 
 services:
-  multiverse-service:
-    tty: true
-    image: multiverseframework/multiverse:ubuntu-20.04
-    build:
-      context: ./images/Multiverse-image/
-      dockerfile: Dockerfile
-    container_name: multiverse-container
-
   multiverse-tutorials-service:
     tty: true
     image: multiverseframework/multiverse-tutorials:ubuntu-20.04
@@ -21,8 +13,6 @@ services:
       context: ./images/Multiverse-Tutorials-image/
       dockerfile: Dockerfile
     container_name: multiverse-tutorials-container
-    depends_on:
-      - multiverse-service
     command: jupyter lab --allow-root --NotebookApp.token='' --no-browser --ip=0.0.0.0
     ports:
       - 8888:8888
