@@ -24,8 +24,5 @@ services:
     depends_on:
       - multiverse-service
     command: jupyter lab --allow-root --NotebookApp.token='' --no-browser --ip=0.0.0.0
-    # command: xvfb-run jupyter lab --allow-root --NotebookApp.token='' --no-browser --ip=0.0.0.0
-    # user: root
-    # working_dir: /home
     ports:
       - 8888:8888
