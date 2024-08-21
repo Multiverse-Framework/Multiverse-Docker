@@ -99,9 +99,7 @@ RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m pip install \
 RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m pip install panel jupyter-server bash_kernel
 RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m bash_kernel.install
 
-# Copy packages
-COPY Multiverse /home/Multiverse
-WORKDIR /home/Multiverse
+# Prepare the environment
 
 ARG MULTIVERSE_DIR=/home/Multiverse/multiverse
 ARG BIN_DIR=$MULTIVERSE_DIR/bin
@@ -110,19 +108,16 @@ ARG BUILD_DIR=$MULTIVERSE_DIR/build
 ARG SRC_DIR=$MULTIVERSE_DIR/src
 ARG LIB_DIR=$MULTIVERSE_DIR/lib
 
-RUN git submodule update --init $MULTIVERSE_DIR/modules/multiverse_knowledge
-
 RUN mkdir -p $BIN_DIR
 RUN mkdir -p $BUILD_DIR
 
 # Build USD
-
 ARG USD_BUILD_DIR=$BUILD_DIR/USD
 ARG USD_EXT_DIR=$EXT_DIR/USD
 
 RUN mkdir -p $USD_BUILD_DIR
 
-RUN git submodule update --init $USD_EXT_DIR
+RUN git clone https://github.com/PixarAnimationStudios/OpenUSD.git --branch v24.05 $USD_EXT_DIR
 RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; python3.8 $USD_EXT_DIR/build_scripts/build_usd.py $USD_BUILD_DIR"
 RUN ln -sf $USD_BUILD_DIR/bin/usdview $BIN_DIR
 RUN ln -sf $USD_BUILD_DIR/bin/usdGenSchema $BIN_DIR
@@ -145,7 +140,6 @@ RUN ln -sf $BLENDER_BUILD_DIR/blender $BIN_DIR
 RUN ln -sf $BLENDER_BUILD_DIR/4.2/python/bin/python3.11 $BIN_DIR
 
 # Build MuJoCo
-
 ARG MUJOCO_BUILD_DIR=$BUILD_DIR/mujoco
 RUN mkdir -p $MUJOCO_BUILD_DIR
 
@@ -156,23 +150,6 @@ RUN curl -sL https://github.com/google-deepmind/mujoco/releases/download/3.2.2/$
 # RUN  mkdir -p $MUJOCO_BUILD_DIR; cd $MUJOCO_BUILD_DIR && cmake $MUJOCO_EXT_DIR -DCMAKE_INSTALL_PREFIX=$MUJOCO_BUILD_DIR -Wno-deprecated -Wno-dev && cmake --build . && cmake --install .
 
 RUN ln -sf $MUJOCO_BUILD_DIR/bin/simulate $BIN_DIR
-
-# Add PATH and PYTHONPATH
-ENV PATH=$PATH:$BIN_DIR
-ENV PYTHONPATH=$LIB_DIR/libstdc++/python:$USD_BUILD_DIR/lib/python
-
-RUN echo "export PATH=$PATH" >> ~/.bashrc
-RUN echo "export PYTHONPATH=$PYTHONPATH" >> ~/.bashrc
-
-# Build the software
-
-# Fix g++ for pybind11
-RUN update-alternatives --remove g++ /usr/bin/g++-11 && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100 
-
-RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; ./build_multiverse.sh"
-
-# Build the ROS workspace
-RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; ./build_multiverse_ws.sh; ./build_multiverse_ws2.sh"
 
 RUN apt-get update && apt-get upgrade -y
 
@@ -207,8 +184,29 @@ RUN apt-get install -y \
     ros-foxy-effort-controllers \
     ros-foxy-gripper-controllers
 
+# Add PATH and PYTHONPATH
+ENV PATH=$PATH:$BIN_DIR
+ENV PYTHONPATH=$LIB_DIR/libstdc++/python:$USD_BUILD_DIR/lib/python
+
+RUN echo "export PATH=$PATH" >> ~/.bashrc
 RUN echo "export PYTHONPATH=$PYTHONPATH:$MULTIVERSE_DIR/lib/dist-packages" >> ~/.bashrc
 RUN echo "source /usr/local/bin/virtualenvwrapper.sh && workon multiverse" >> ~/.bashrc
+
+# Copy packages
+COPY Multiverse /home/Multiverse
+WORKDIR /home/Multiverse
+
+RUN git submodule update --init $MULTIVERSE_DIR/modules/multiverse_knowledge
+
+# Build the software
+
+# Fix g++ for pybind11
+RUN update-alternatives --remove g++ /usr/bin/g++-11 && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100 
+
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; ./build_multiverse.sh"
+
+# Build the ROS workspace
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; ./build_multiverse_ws.sh; ./build_multiverse_ws2.sh"
 
 # --- Install VNC server and XFCE desktop environment --- #
 USER root

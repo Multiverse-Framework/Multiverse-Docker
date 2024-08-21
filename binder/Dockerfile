@@ -1,4 +1,4 @@
-FROM multiverseframework/multiverse-tutorials:ubuntu-20.04@sha256:595250d17e32c3b7ea08384f1aebed10182ddbdbf0c72bc0cf829fd3873636a2
+FROM multiverseframework/multiverse-tutorials:ubuntu-20.04@sha256:8497af5a6379ee818f51319a7ec7d148fde876536f06b1e061bb9a0b4a097adf
 
 # Update every workspace
 RUN cd ../Multiverse && git remote set-url origin https://github.com/Multiverse-Framework/Multiverse.git && git checkout main && git pull origin main
