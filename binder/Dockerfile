@@ -54,6 +54,12 @@ RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; workon multiverse;
 # Copy necessary files
 COPY --chown=${NB_USER}:users binder /home/binder
 
+USER root
+RUN apt update && rosdep install -y --ignore-src --from-paths ./ -r
+RUN chown -R ${NB_UID} /home/${NB_USER} && \
+    chown  ${NB_UID} /home/Multiverse
+USER ${NB_USER}
+
 # Install OH-My-Bash
 RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)" --unattended && \
     sed -i 's/OSH_THEME="font"/OSH_THEME="half-life"/' /home/${NB_USER}/.bashrc
