@@ -1,4 +1,4 @@
-FROM multiverseframework/multiverse-tutorials:ubuntu-20.04@sha256:267912465afa60295265b69f8d7064dac75d5fd125b496480ccce7268eb1f508
+FROM multiverseframework/multiverse-tutorials:ubuntu-20.04@sha256:8efa171a929dd9efea6a9662edc842e4e4c180148577dc1a4ccbe4452c7ae70e
 
 USER root
 ENV SHELL=/bin/bash
@@ -15,7 +15,7 @@ ENV HOME /home/${NB_USER}
 #     ${NB_USER}
 
 # Install apt packages
-RUN apt-get update && apt-get install -y curl vim xvfb htop ros-noetic-tf2-tools ros-noetic-rosbridge-suite ros-noetic-roswww ros-noetic-tf2-web-republisher
+RUN apt-get update && apt-get install -y curl vim xvfb htop ros-noetic-tf2-tools
 # Install nodejs (dependency of Jupyterlab extensions)
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - &&\
     apt-get install -y nodejs
@@ -53,20 +53,6 @@ RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; workon multiverse;
 
 # Copy necessary files
 COPY --chown=${NB_USER}:users binder /home/binder
-
-# Install ROS web tools under workspace multiverse_ws
-USER ${NB_USER}
-WORKDIR /home/Multiverse/multiverse_ws/src
-RUN wstool init && \
-    wstool merge https://raw.githubusercontent.com/yxzhan/rvizweb/master/.rosinstall && \
-    wstool update
-RUN rosdep update
-USER root
-RUN apt update && rosdep install -y --ignore-src --from-paths ./ -r
-RUN chown -R ${NB_UID} /home/${NB_USER} && \
-    chown  ${NB_UID} /home/Multiverse
-USER ${NB_USER}
-RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; workon multiverse; catkin build"
 
 # Install OH-My-Bash
 RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)" --unattended && \
