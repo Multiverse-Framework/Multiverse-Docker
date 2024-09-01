@@ -42,6 +42,7 @@ RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws2
 RUN chown -R ${NB_UID} /home/Multiverse-Tutorials/resources
 RUN chown -R ${NB_UID} /tmp
 RUN mkdir /home/Multiverse-Tutorials/output && chown -R ${NB_UID} /home/Multiverse-Tutorials/output
+RUN chown -R ${NB_UID} /home/Multiverse-Tutorials/tutorials/multiverse_client
 
 ARG MULTIVERSE_DIR=/home/Multiverse/multiverse
 ARG BUILD_DIR=$MULTIVERSE_DIR/build
