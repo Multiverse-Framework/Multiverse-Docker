@@ -11,4 +11,4 @@ RUN jupyter nbextension enable --py widgetsnbextension
 COPY Multiverse-Tutorials /home/Multiverse-Tutorials
 RUN cd /home/Multiverse-Tutorials/src; python get_meshes.py; python3.11 extract_objects.py
 
-WORKDIR /home/Multiverse-Tutorials
+WORKDIR /home

@@ -186,10 +186,10 @@ RUN apt-get install -y \
 
 # Add PATH and PYTHONPATH
 ENV PATH=$PATH:$BIN_DIR
-ENV PYTHONPATH=$LIB_DIR/libstdc++/python:$USD_BUILD_DIR/lib/python
+ENV PYTHONPATH=$PYTHONPATH:$USD_BUILD_DIR/lib/python:$MULTIVERSE_DIR/lib/dist-packages
 
 RUN echo "export PATH=$PATH" >> ~/.bashrc
-RUN echo "export PYTHONPATH=$PYTHONPATH:$MULTIVERSE_DIR/lib/dist-packages" >> ~/.bashrc
+RUN echo "export PYTHONPATH=$PYTHONPATH" >> ~/.bashrc
 RUN echo "source /usr/local/bin/virtualenvwrapper.sh && workon multiverse" >> ~/.bashrc
 
 # Copy packages

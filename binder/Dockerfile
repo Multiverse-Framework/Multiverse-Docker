@@ -1,4 +1,4 @@
-FROM multiverseframework/multiverse-tutorials:ubuntu-20.04@sha256:6daf415c98db054fd3696d7dc346f62ea93e986112d401cb969f298e73aa3dc7
+FROM multiverseframework/multiverse-tutorials:ubuntu-20.04@sha256:679fb4741ef2bf375fe02c4070a09c2f4d84e1c313a501dd653997722a22973a
 
 USER root
 ENV SHELL=/bin/bash
@@ -40,7 +40,6 @@ RUN chown -R ${NB_UID} /home/Multiverse/multiverse/saved
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws2
 RUN chown -R ${NB_UID} /home/Multiverse-Tutorials/resources
-RUN chown -R ${NB_UID} /tmp
 RUN mkdir /home/Multiverse-Tutorials/output && chown -R ${NB_UID} /home/Multiverse-Tutorials/output
 RUN chown -R ${NB_UID} /home/Multiverse-Tutorials/tutorials/multiverse_client
 
@@ -58,7 +57,7 @@ COPY --chown=${NB_USER}:users binder /home/binder
 USER root
 RUN apt update && rosdep install -y --ignore-src --from-paths ./ -r
 RUN chown -R ${NB_UID} /home/${NB_USER} && \
-    chown  ${NB_UID} /home/Multiverse
+    chown ${NB_UID} /home/Multiverse
 USER ${NB_USER}
 
 # Install OH-My-Bash
