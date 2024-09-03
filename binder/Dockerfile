@@ -71,5 +71,5 @@ RUN echo "export PYTHONPATH=$PYTHONPATH:$MULTIVERSE_DIR/lib/dist-packages" >> ~/
 RUN echo "source /usr/local/bin/virtualenvwrapper.sh && workon multiverse" >> ~/.bashrc
 
 USER ${NB_USER}
-WORKDIR /home/Multiverse-Tutorials
+WORKDIR /home
 ENTRYPOINT ["/home/binder/entrypoint.sh"]
