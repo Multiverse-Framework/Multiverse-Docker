@@ -55,7 +55,7 @@ RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; workon multiverse;
 COPY --chown=${NB_USER}:users binder /home/binder
 
 USER root
-RUN apt update && rosdep install -y --ignore-src --from-paths ./ -r
+RUN apt update && rosdep install -y --ignore-src --from-paths /home/Multiverse/multiverse_ws/src -r && rosdep install -y --ignore-src --from-paths /home/Multiverse/multiverse_ws2/src -r
 RUN chown -R ${NB_UID} /home/${NB_USER} && \
     chown ${NB_UID} /home/Multiverse
 USER ${NB_USER}
