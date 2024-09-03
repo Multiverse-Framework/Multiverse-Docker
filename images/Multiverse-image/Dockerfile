@@ -93,7 +93,8 @@ RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m pip install \
     urdf_parser_py \
     mujoco==3.2.0 \
     scipy \
-    cmake
+    cmake \
+    inflection
 
 # Instal bash kernel
 RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m pip install panel jupyter-server bash_kernel
