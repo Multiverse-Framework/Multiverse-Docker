@@ -187,7 +187,7 @@ RUN apt-get install -y \
 
 # Add PATH and PYTHONPATH
 ENV PATH=$PATH:$BIN_DIR
-ENV PYTHONPATH=$PYTHONPATH:$USD_BUILD_DIR/lib/python:$MULTIVERSE_DIR/lib/dist-packages
+ENV PYTHONPATH=$USD_BUILD_DIR/lib/python:$MULTIVERSE_DIR/lib/dist-packages
 
 RUN echo "export PATH=$PATH" >> ~/.bashrc
 RUN echo "export PYTHONPATH=$PYTHONPATH" >> ~/.bashrc
