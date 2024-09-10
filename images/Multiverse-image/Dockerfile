@@ -80,7 +80,7 @@ ENV VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.8
 RUN python3.8 -m pip install virtualenvwrapper
 RUN /bin/bash -c "source $(which virtualenvwrapper.sh) && mkvirtualenv --system-site-packages multiverse"
 
-RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m pip install --upgrade pip
+RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m pip install --upgrade pip setuptools packaging
 RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m pip install \
     pyside6 \
     pyopengl \
@@ -91,7 +91,7 @@ RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m pip install \
     jinja2 \
     pybind11 \
     urdf_parser_py \
-    mujoco==3.2.0 \
+    mujoco==3.2.2 \
     scipy \
     cmake \
     inflection
