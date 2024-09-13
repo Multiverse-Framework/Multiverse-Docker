@@ -39,6 +39,7 @@ RUN chown -R ${NB_UID} /tmp
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse/modules/multiverse_knowledge/Konclude
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse/modules/multiverse_knowledge/ease_lexical_resources
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse/modules/multiverse_connectors/scripts/utils/config
+RUN chown -R ${NB_UID} /home/Multiverse/multiverse/bin
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse/resources
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse/saved
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws
