@@ -2,7 +2,21 @@
 
 This repository provides an example of how to execute Multiverse Framework within a Docker environment.
 
-## Prerequisites
+You can operate the Multiverse Framework with Docker in two ways: on the cloud or locally.
+
+## Run Multiverse Docker on the Cloud using BinderHub
+
+- [Link to the BinderHub](https://binder.intel4coro.de/v2/gh/Multiverse-Framework/Multiverse-Docker/main)
+
+For the ICRA2025 experiments, you can quickly access these Jupyter Notebooks:
+
+- [Universal Scene Description Parser Experiment (for URDF, MJCF and USDA as input)](https://binder.intel4coro.de/v2/gh/Multiverse-Framework/Multiverse-Docker/main?urlpath=lab%2Ftree%2FMultiverse-Tutorials%2Ftutorials%2Fmultiverse_parser_quick_start.ipynb)
+- [Universal Scene Description Parser Experiment (for ProcTHOR as input)](https://binder.intel4coro.de/v2/gh/Multiverse-Framework/Multiverse-Docker/main?urlpath=lab%2Ftree%2FMultiverse-Tutorials%2Ftutorials%2Fmultiverse_knowledge_quick_start.ipynb)
+- [Competency Questions Experiment](https://binder.intel4coro.de/v2/gh/sasjonge/semantic-map-lab.git/dfl_reasoner?labpath=notebooks%2Fsemantic_map.ipynb)
+
+## Run Multiverse Docker locally
+
+### Prerequisites
 
 Ensure that you have [Docker](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository) installed.
 
@@ -17,9 +31,10 @@ Docker Compose version v2.29.1
 
 ### 1. Set up Docker
 
-Run the following commands to configure Docker:
+Run the following commands to clone the repository and configure Docker:
 
 ```bash
+git clone https://github.com/Multiverse-Framework/Multiverse-Docker.git && cd Multiverse-Docker
 ./setup_images.bash
 docker compose pull
 ```
