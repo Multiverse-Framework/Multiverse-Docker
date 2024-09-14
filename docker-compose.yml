@@ -8,7 +8,7 @@ networks:
 services:
   multiverse-tutorials-service:
     tty: true
-    image: multiverseframework/multiverse-tutorials:ubuntu-20.04
+    image: multiverseframework/multiverse-tutorials:ICRA-2025
     build:
       context: ./images/Multiverse-Tutorials-image/
       dockerfile: Dockerfile
