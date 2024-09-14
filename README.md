@@ -6,12 +6,12 @@ You can operate the Multiverse Framework with Docker in two ways: on the cloud o
 
 ## Run Multiverse Docker on the Cloud using BinderHub
 
-- [Link to the BinderHub](https://binder.intel4coro.de/v2/gh/Multiverse-Framework/Multiverse-Docker/main)
+- [Link to the BinderHub](https://binder.intel4coro.de/v2/gh/Multiverse-Framework/Multiverse-Docker/ICRA-2025)
 
 For the ICRA2025 experiments, you can quickly access these Jupyter Notebooks:
 
-- [Universal Scene Description Parser Experiment (for URDF, MJCF and USDA as input)](https://binder.intel4coro.de/v2/gh/Multiverse-Framework/Multiverse-Docker/main?urlpath=lab%2Ftree%2FMultiverse-Tutorials%2Ftutorials%2Fmultiverse_parser_quick_start.ipynb)
-- [Universal Scene Description Parser Experiment (for ProcTHOR as input)](https://binder.intel4coro.de/v2/gh/Multiverse-Framework/Multiverse-Docker/main?urlpath=lab%2Ftree%2FMultiverse-Tutorials%2Ftutorials%2Fmultiverse_knowledge_quick_start.ipynb)
+- [Universal Scene Description Parser Experiment (for URDF, MJCF and USDA as input)](https://binder.intel4coro.de/v2/gh/Multiverse-Framework/Multiverse-Docker/ICRA-2025?urlpath=lab%2Ftree%2FMultiverse-Tutorials%2Ftutorials%2Fmultiverse_parser_quick_start.ipynb)
+- [Universal Scene Description Parser Experiment (for ProcTHOR as input)](https://binder.intel4coro.de/v2/gh/Multiverse-Framework/Multiverse-Docker/ICRA-2025?urlpath=lab%2Ftree%2FMultiverse-Tutorials%2Ftutorials%2Fmultiverse_knowledge_quick_start.ipynb)
 - [Competency Questions Experiment](https://binder.intel4coro.de/v2/gh/sasjonge/semantic-map-lab.git/dfl_reasoner?labpath=notebooks%2Fsemantic_map.ipynb)
 
 ## Run Multiverse Docker locally
