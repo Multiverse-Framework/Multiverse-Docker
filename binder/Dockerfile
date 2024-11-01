@@ -41,7 +41,7 @@ RUN chown -R ${NB_UID} /home/Multiverse/multiverse/saved
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws2
 RUN chown -R ${NB_UID} /home/Multiverse-Tutorials/resources
-RUN mkdir /home/Multiverse-Tutorials/output && chown -R ${NB_UID} /home/Multiverse-Tutorials/output
+RUN chown -R ${NB_UID} /home/Multiverse-Tutorials/output
 RUN chown -R ${NB_UID} /home/Multiverse-Tutorials/tutorials/multiverse_client
 RUN chown -R ${NB_UID} /home/Multiverse-Tutorials/src
 
