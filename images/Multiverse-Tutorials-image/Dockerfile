@@ -1,4 +1,4 @@
-FROM multiverseframework/multiverse:ubuntu-20.04
+FROM multiverseframework/multiverse:FallSchool-2024
 
 RUN mkdir -p /home/Multiverse-Tutorials/src
 RUN cd /home/Multiverse-Tutorials/src; git clone https://github.com/allenai/ai2thor.git --depth 1
