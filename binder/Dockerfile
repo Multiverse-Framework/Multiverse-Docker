@@ -1,4 +1,4 @@
-FROM multiverseframework/multiverse-tutorials:ICRA-2025
+FROM multiverseframework/multiverse-tutorials:latest
 
 USER root
 ENV SHELL=/bin/bash
