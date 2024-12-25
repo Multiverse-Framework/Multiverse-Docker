@@ -8,10 +8,10 @@ networks:
 services:
   multiverse-tutorials-service:
     tty: true
-    image: multiverseframework/multiverse-tutorials:FallSchool-2024
+    image: multiverseframework/multiverse-tutorials:ubuntu-22.04
     build:
       context: ./images/Multiverse-Tutorials-image/
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-22.04
     container_name: multiverse-tutorials-container
     command: jupyter lab --allow-root --NotebookApp.token='' --no-browser --ip=0.0.0.0
     ports:

@@ -1,0 +1,213 @@
+FROM jupyter/minimal-notebook:ubuntu-22.04
+
+USER root
+
+# Zero interaction while installing or upgrading the system via apt, see https://bobcares.com/blog/debian_frontendnoninteractive-docker/
+ENV DEBIAN_FRONTEND=noninteractive
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
+RUN apt-get update && apt-get upgrade -y
+
+RUN apt-get install -y software-properties-common curl
+
+# Set locale (https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html)
+RUN apt-get install locales
+RUN locale-gen en_US en_US.UTF-8
+RUN update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+RUN LANG=en_US.UTF-8
+
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+RUN apt-get update && apt-get install -y ros-humble-desktop ros-dev-tools
+
+# Install prerequisites
+RUN apt-get update && apt-get install -y \
+    python-is-python3 \
+    libglfw3 \
+    libzmq3-dev \
+    libgl1-mesa-dev \
+    libglu1-mesa-dev \
+    libxt-dev \
+    git \
+    git-lfs \
+    libjsoncpp-dev \
+    build-essential \
+    subversion \
+    cmake \
+    libx11-dev \
+    libxxf86vm-dev \
+    libxcursor-dev \
+    libxi-dev \
+    libxrandr-dev \
+    libxinerama-dev \
+    libegl-dev \
+    libwayland-dev \
+    wayland-protocols \
+    libxkbcommon-dev \
+    libdbus-1-dev \
+    linux-libc-dev \
+    libxcb-cursor0 \
+    pybind11-dev
+
+# Install compilers
+RUN apt-get install -y clang-14 llvm-14-dev libc++-14-dev libc++abi-14-dev libstdc++-12-dev 
+
+# Install rosdep
+RUN apt-get install -y python3-rosdep && rosdep init && rosdep fix-permissions && rosdep update
+
+# Install pip
+RUN apt-get install -y python3-pip && python3 -m pip install --upgrade pip build
+
+# Install virtualenvwrapper
+ENV VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.10
+RUN python3.10 -m pip install virtualenvwrapper
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh) && mkvirtualenv --system-site-packages multiverse -p python3.10"
+
+RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install --upgrade pip setuptools packaging distro
+RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install \
+    pyside6 \
+    pyopengl \
+    wheel \
+    cython \
+    owlready2 \
+    markupsafe==2.0.1 \
+    jinja2 \
+    pybind11 \
+    urdf_parser_py \
+    mujoco==3.2.6 \
+    mujoco-mjx==3.2.6 \
+    "jax[cuda12_pip]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html \
+    scipy \
+    cmake \
+    inflection
+
+# Instal bash kernel
+RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install panel jupyter-server bash_kernel
+RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m bash_kernel.install
+
+# Prepare the environment
+
+ARG MULTIVERSE_DIR=/home/Multiverse/multiverse
+ARG BIN_DIR=$MULTIVERSE_DIR/bin
+ARG EXT_DIR=$MULTIVERSE_DIR/external
+ARG BUILD_DIR=$MULTIVERSE_DIR/build
+ARG SRC_DIR=$MULTIVERSE_DIR/src
+ARG LIB_DIR=$MULTIVERSE_DIR/lib
+
+RUN mkdir -p $BIN_DIR
+RUN mkdir -p $BUILD_DIR
+
+# Build USD
+ARG USD_BUILD_DIR=$BUILD_DIR/USD
+ARG USD_EXT_DIR=$EXT_DIR/USD
+
+RUN mkdir -p $USD_BUILD_DIR
+
+RUN git clone https://github.com/PixarAnimationStudios/OpenUSD.git --branch v24.11 $USD_EXT_DIR
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; python3.10 $USD_EXT_DIR/build_scripts/build_usd.py $USD_BUILD_DIR"
+RUN ln -sf $USD_BUILD_DIR/bin/usdview $BIN_DIR
+RUN ln -sf $USD_BUILD_DIR/bin/usdGenSchema $BIN_DIR
+RUN ln -sf $USD_BUILD_DIR/bin/usdcat $BIN_DIR
+
+# Build blender
+ARG BLENDER_BUILD_DIR=$BUILD_DIR/blender
+RUN mkdir -p $BLENDER_BUILD_DIR
+
+ARG BLENDER_TAR_FILE=blender-4.2.0-linux-x64.tar.xz
+RUN curl -o $EXT_DIR/$BLENDER_TAR_FILE https://download.blender.org/release/Blender4.2/$BLENDER_TAR_FILE; tar xf $EXT_DIR/$BLENDER_TAR_FILE -C $BLENDER_BUILD_DIR --strip-components=1
+RUN cd $BLENDER_BUILD_DIR/4.2/python/bin && ./python3.11 -m pip install --upgrade pip build --no-warn-script-location && ./python3.11 -m pip install bpy Pillow --no-warn-script-location
+
+# ARG BLENDER_EXT_DIR=$EXT_DIR/blender-git
+# RUN cd $BLENDER_EXT_DIR/blender && ./build_files/utils/make_update.py --use-linux-libraries
+# RUN cd $BLENDER_BUILD_DIR && cmake -S ../../external/blender-git/blender -B . -Wno-deprecated -Wno-dev && make -j$(nproc) && make install
+# RUN cd $BLENDER_BUILD_DIR/bin/4.2/python/bin && ./python3.11 -m pip install --upgrade pip build --no-warn-script-location && ./python3.11 -m pip install bpy Pillow --no-warn-script-location
+
+RUN ln -sf $BLENDER_BUILD_DIR/blender $BIN_DIR
+RUN ln -sf $BLENDER_BUILD_DIR/4.2/python/bin/python3.11 $BIN_DIR
+
+# Build MuJoCo
+ARG MUJOCO_BUILD_DIR=$BUILD_DIR/mujoco
+RUN mkdir -p $MUJOCO_BUILD_DIR
+
+# ARG MUJOCO_TAR_FILE=mujoco-3.2.6-linux-x86_64.tar.gz
+# RUN curl -sL https://github.com/google-deepmind/mujoco/releases/download/3.2.6/$MUJOCO_TAR_FILE | tar zx -C $MUJOCO_BUILD_DIR --strip-components=1
+
+ARG MUJOCO_EXT_DIR=$EXT_DIR/mujoco
+RUN git clone https://github.com/google-deepmind/mujoco.git --branch 3.2.6 $MUJOCO_EXT_DIR
+RUN mkdir -p $MUJOCO_BUILD_DIR; cd $MUJOCO_BUILD_DIR && cmake $MUJOCO_EXT_DIR -DCMAKE_INSTALL_PREFIX=$MUJOCO_BUILD_DIR -Wno-deprecated -Wno-dev && cmake --build . && cmake --install .
+
+RUN ln -sf $MUJOCO_BUILD_DIR/bin/simulate $BIN_DIR
+
+RUN apt-get update && apt-get upgrade -y
+
+# Install additional packages for ROS2
+RUN apt-get install -y \
+    ros-humble-xacro \
+    ros-humble-rviz2 \
+    ros-humble-joint-trajectory-controller \
+    ros-humble-rqt-robot-steering \
+    ros-humble-rqt-joint-trajectory-controller \
+    ros-humble-joint-state-broadcaster \
+    ros-humble-joint-state-publisher-gui \
+    ros-humble-position-controllers \
+    ros-humble-velocity-controllers \
+    ros-humble-effort-controllers \
+    ros-humble-gripper-controllers
+
+# Add PATH and PYTHONPATH
+ENV PATH=$PATH:$BIN_DIR
+# ENV PYTHONPATH=$USD_BUILD_DIR/lib/python:$MULTIVERSE_DIR/lib/dist-packages
+
+RUN echo "export PATH=$PATH" >> ~/.bashrc
+RUN echo "export PYTHONPATH=$PYTHONPATH" >> ~/.bashrc
+RUN echo "source /usr/local/bin/virtualenvwrapper.sh && workon multiverse" >> ~/.bashrc
+
+# Copy packages
+COPY Multiverse /home/Multiverse
+WORKDIR /home/Multiverse
+
+RUN git submodule update --init $MULTIVERSE_DIR/modules/multiverse_knowledge
+
+# Build the software
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; ./build_multiverse.sh"
+
+# Build the ROS workspace
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; ./build_multiverse_ws2.sh"
+
+# --- Install VNC server and XFCE desktop environment --- #
+USER root
+RUN apt-get -y -qq update && apt-get -y -qq install \
+    dbus-x11 \
+    firefox \
+    xfce4 \
+    xfce4-panel \
+    xfce4-session \
+    xfce4-settings \
+    xorg \
+    gnome-shell \
+    gnome-session \
+    gnome-terminal \
+    xubuntu-icon-theme \
+    fonts-dejavu \
+    # Disable the automatic screenlock since the account password is unknown
+    && apt-get -y -qq remove xfce4-screensaver \
+    # chown $HOME to workaround that the xorg installation creates a
+    # /home/jovyan/.cache directory owned by root
+    # Create /opt/install to ensure it's writable by pip
+    && mkdir -p /opt/install \
+    && chown -R $NB_UID:$NB_GID $HOME /opt/install
+
+# Install a VNC server, either TigerVNC (default) or TurboVNC
+ENV PATH=/opt/TurboVNC/bin:$PATH
+RUN echo "Installing TurboVNC"; \
+    # Install instructions from https://turbovnc.org/Downloads/YUM
+    wget -q -O- https://packagecloud.io/dcommander/turbovnc/gpgkey | \
+    gpg --dearmor >/etc/apt/trusted.gpg.d/TurboVNC.gpg; \
+    wget -O /etc/apt/sources.list.d/TurboVNC.list https://raw.githubusercontent.com/TurboVNC/repo/main/TurboVNC.list; \
+    apt-get -y -qq update; \
+    apt-get -y -qq install \
+    turbovnc
+
+RUN conda install -y websockify
+RUN pip install jupyter-remote-desktop-proxy jupyterlab
+ENV DISPLAY=:1
