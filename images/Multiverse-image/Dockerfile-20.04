@@ -26,6 +26,9 @@ RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o 
 RUN add-apt-repository universe
 RUN apt-get update && apt-get install -y ros-foxy-desktop ros-dev-tools
 
+RUN add-apt-repository ppa:deadsnakes/ppa
+RUN apt-get update
+
 # Install prerequisites
 RUN apt-get update && apt-get install -y \
     python-is-python3 \
@@ -57,8 +60,11 @@ RUN apt-get update && apt-get install -y \
     libxcb-cursor0 \
     pybind11-dev
 
-# Install and link python3.8
-RUN apt-get install -y python3.8-dev python3.8-venv && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 100
+# Install python3.8
+RUN apt-get install -y python3.8-dev python3.8-venv
+
+# Install python3.10
+RUN apt-get install -y python3.10-dev python3.10-venv
 
 # Install and link gcc-11
 RUN apt-get install -y gcc-11 && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100
@@ -73,15 +79,18 @@ RUN apt-get install -y clang-11 libc++-11-dev libstdc++-11-dev libc++abi-11-dev 
 RUN apt-get install -y python3-rosdep && rosdep init && rosdep fix-permissions && rosdep update
 
 # Install pip
-RUN apt-get install -y python3-pip && python3.8 -m pip install --upgrade pip build
+RUN apt-get install -y python3-pip && python3.8 -m pip install --upgrade pip build && python3.10 -m pip install --upgrade pip build
+
+# urdf_parser_py cannot be installed inside the virtualenv
+RUN pip install urdf_parser_py
 
 # Install virtualenvwrapper
-ENV VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.8
-RUN python3.8 -m pip install virtualenvwrapper
-RUN /bin/bash -c "source $(which virtualenvwrapper.sh) && mkvirtualenv --system-site-packages multiverse"
+ENV VIRTUALENVWRAPPER_PYTHON=/opt/conda/bin/python
+RUN pip install virtualenvwrapper
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh) && mkvirtualenv --system-site-packages multiverse3.8 -p python3.8"
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh) && mkvirtualenv --system-site-packages multiverse -p python3.10"
 
-RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m pip install --upgrade pip setuptools packaging
-RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m pip install \
+RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install \
     pyside6 \
     pyopengl \
     wheel \
@@ -90,15 +99,16 @@ RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m pip install \
     markupsafe==2.0.1 \
     jinja2 \
     pybind11 \
-    urdf_parser_py \
-    mujoco==3.2.2 \
+    mujoco==3.2.7 \
+    mujoco-mjx==3.2.7 \
     scipy \
     cmake \
     inflection
+RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install --upgrade pip build setuptools packaging
 
 # Instal bash kernel
-RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m pip install panel jupyter-server bash_kernel
-RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.8 -m bash_kernel.install
+RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install panel jupyter-server bash_kernel
+RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m bash_kernel.install
 
 # Prepare the environment
 
@@ -118,8 +128,10 @@ ARG USD_EXT_DIR=$EXT_DIR/USD
 
 RUN mkdir -p $USD_BUILD_DIR
 
-RUN git clone https://github.com/PixarAnimationStudios/OpenUSD.git --branch v24.05 $USD_EXT_DIR
-RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; python3.8 $USD_EXT_DIR/build_scripts/build_usd.py $USD_BUILD_DIR"
+RUN conda install libpython-static
+RUN git clone https://github.com/PixarAnimationStudios/OpenUSD.git --branch v25.02 $USD_EXT_DIR
+RUN python3.8 -m pip install pyside6 pyopengl
+RUN /bin/bash -c "python3.8 $USD_EXT_DIR/build_scripts/build_usd.py $USD_BUILD_DIR --verbose"
 RUN ln -sf $USD_BUILD_DIR/bin/usdview $BIN_DIR
 RUN ln -sf $USD_BUILD_DIR/bin/usdGenSchema $BIN_DIR
 RUN ln -sf $USD_BUILD_DIR/bin/usdcat $BIN_DIR
@@ -135,7 +147,7 @@ RUN cd $BLENDER_BUILD_DIR/4.2/python/bin && ./python3.11 -m pip install --upgrad
 # ARG BLENDER_EXT_DIR=$EXT_DIR/blender-git
 # RUN cd $BLENDER_EXT_DIR/blender && ./build_files/utils/make_update.py --use-linux-libraries
 # RUN cd $BLENDER_BUILD_DIR && cmake -S ../../external/blender-git/blender -B . -Wno-deprecated -Wno-dev && make -j$(nproc) && make install
-# RUN cd $BLENDER_BUILD_DIR/bin/4.1/python/bin && ./python3.11 -m pip install --upgrade pip build --no-warn-script-location && ./python3.11 -m pip install bpy Pillow --no-warn-script-location
+# RUN cd $BLENDER_BUILD_DIR/bin/4.2/python/bin && ./python3.11 -m pip install --upgrade pip build --no-warn-script-location && ./python3.11 -m pip install bpy Pillow --no-warn-script-location
 
 RUN ln -sf $BLENDER_BUILD_DIR/blender $BIN_DIR
 RUN ln -sf $BLENDER_BUILD_DIR/4.2/python/bin/python3.11 $BIN_DIR
@@ -144,11 +156,12 @@ RUN ln -sf $BLENDER_BUILD_DIR/4.2/python/bin/python3.11 $BIN_DIR
 ARG MUJOCO_BUILD_DIR=$BUILD_DIR/mujoco
 RUN mkdir -p $MUJOCO_BUILD_DIR
 
-ARG MUJOCO_TAR_FILE=mujoco-3.2.2-linux-x86_64.tar.gz
-RUN curl -sL https://github.com/google-deepmind/mujoco/releases/download/3.2.2/$MUJOCO_TAR_FILE | tar zx -C $MUJOCO_BUILD_DIR --strip-components=1
+# ARG MUJOCO_TAR_FILE=mujoco-3.2.7-linux-x86_64.tar.gz
+# RUN curl -sL https://github.com/google-deepmind/mujoco/releases/download/3.2.7/$MUJOCO_TAR_FILE | tar zx -C $MUJOCO_BUILD_DIR --strip-components=1
 
-# ARG MUJOCO_EXT_DIR=$EXT_DIR/mujoco
-# RUN  mkdir -p $MUJOCO_BUILD_DIR; cd $MUJOCO_BUILD_DIR && cmake $MUJOCO_EXT_DIR -DCMAKE_INSTALL_PREFIX=$MUJOCO_BUILD_DIR -Wno-deprecated -Wno-dev && cmake --build . && cmake --install .
+ARG MUJOCO_EXT_DIR=$EXT_DIR/mujoco
+RUN git clone https://github.com/google-deepmind/mujoco.git --branch 3.2.7 $MUJOCO_EXT_DIR
+RUN  mkdir -p $MUJOCO_BUILD_DIR; cd $MUJOCO_BUILD_DIR && cmake $MUJOCO_EXT_DIR -DCMAKE_INSTALL_PREFIX=$MUJOCO_BUILD_DIR -Wno-deprecated -Wno-dev && cmake --build . && cmake --install .
 
 RUN ln -sf $MUJOCO_BUILD_DIR/bin/simulate $BIN_DIR
 
@@ -191,23 +204,19 @@ ENV PYTHONPATH=$USD_BUILD_DIR/lib/python:$MULTIVERSE_DIR/lib/dist-packages
 
 RUN echo "export PATH=$PATH" >> ~/.bashrc
 RUN echo "export PYTHONPATH=$PYTHONPATH" >> ~/.bashrc
-RUN echo "source /usr/local/bin/virtualenvwrapper.sh && workon multiverse" >> ~/.bashrc
+RUN echo "source $(which virtualenvwrapper.sh) && workon multiverse" >> ~/.bashrc
 
 # Copy packages
 COPY Multiverse /home/Multiverse
 WORKDIR /home/Multiverse
 
-RUN git submodule update --init $MULTIVERSE_DIR/modules/multiverse_knowledge
-
 # Build the software
-
-# Fix g++ for pybind11
-RUN update-alternatives --remove g++ /usr/bin/g++-11 && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100 
 
 RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; ./build_multiverse.sh"
 
 # Build the ROS workspace
-RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; ./build_multiverse_ws.sh; ./build_multiverse_ws2.sh"
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse3.8; ./build_multiverse_ws.sh"
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse3.8; ./build_multiverse_ws2.sh"
 
 # --- Install VNC server and XFCE desktop environment --- #
 USER root

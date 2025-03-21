@@ -1,4 +1,4 @@
-FROM multiverseframework/multiverse-tutorials:ubuntu-22.04@sha256:ff86fd194f9db01eda79dbc127361790e0beae58515c8d3abca7a78df3ac0a35
+FROM multiverseframework/multiverse-tutorials:ubuntu-20.04@sha256:756da92fb24da592f7c15ab410f924c4c515e3e511fc5636a9446a36ff09ea7d
 
 USER root
 ENV SHELL=/bin/bash
@@ -46,17 +46,17 @@ RUN chown -R ${NB_UID} /home/Multiverse-Tutorials/src
 
 ARG MULTIVERSE_DIR=/home/Multiverse/multiverse
 ARG BUILD_DIR=$MULTIVERSE_DIR/build
-RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; mkvirtualenv --system-site-packages multiverse"
-RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; workon multiverse; pip install pyside6 pyopengl pyside6 wheel cython owlready2 markupsafe==2.0.1 jinja2 pybind11 urdf_parser_py mujoco==3.2.6 mujoco-mjx==3.2.6 "jax[cuda12_pip]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html scipy panel jupyter-server bash_kernel; python -m bash_kernel.install"
-RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; workon multiverse; cmake -S $MULTIVERSE_DIR -B $BUILD_DIR -DCMAKE_INSTALL_PREFIX:PATH=$MULTIVERSE_DIR -DMULTIVERSE_CLIENT_LIBRARY_TYPE=STATIC -DSTDLIB=libstdc++"
-RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; workon multiverse; make -C $BUILD_DIR"
-RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; workon multiverse; cmake --install $BUILD_DIR"
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); mkvirtualenv --system-site-packages multiverse"
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; pip install pyside6 pyopengl pyside6 wheel cython owlready2 markupsafe==2.0.1 jinja2 pybind11 urdf_parser_py mujoco==3.2.7 mujoco-mjx==3.2.7 scipy panel jupyter-server bash_kernel; python -m bash_kernel.install"
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; cmake -S $MULTIVERSE_DIR -B $BUILD_DIR -DCMAKE_INSTALL_PREFIX:PATH=$MULTIVERSE_DIR -DMULTIVERSE_CLIENT_LIBRARY_TYPE=STATIC -DSTDLIB=libstdc++"
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; make -C $BUILD_DIR"
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; cmake --install $BUILD_DIR"
 
 # Copy necessary files
 COPY --chown=${NB_USER}:users binder /home/binder
 
 USER root
-RUN apt update && rosdep install -y --ignore-src --from-paths /home/Multiverse/multiverse_ws2/src -r
+# RUN apt update && rosdep install -y --ignore-src --from-paths /home/Multiverse/multiverse_ws2/src -r
 RUN chown -R ${NB_UID} /home/${NB_USER} && \
     chown ${NB_UID} /home/Multiverse
 USER ${NB_USER}
@@ -67,7 +67,7 @@ RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/
 COPY --chown=${NB_USER}:users binder/jupyter-settings.json /usr/local/share/jupyter/lab/settings/overrides.json
 
 RUN echo "export PYTHONPATH=$PYTHONPATH:$MULTIVERSE_DIR/lib/dist-packages" >> ~/.bashrc
-RUN echo "source /usr/local/bin/virtualenvwrapper.sh && workon multiverse" >> ~/.bashrc
+RUN echo "source $(which virtualenvwrapper.sh) && workon multiverse" >> ~/.bashrc
 
 USER ${NB_USER}
 WORKDIR /home

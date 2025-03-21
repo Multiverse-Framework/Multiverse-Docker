@@ -74,9 +74,8 @@ RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install \
     jinja2 \
     pybind11 \
     urdf_parser_py \
-    mujoco==3.2.6 \
-    mujoco-mjx==3.2.6 \
-    "jax[cuda12_pip]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html \
+    mujoco==3.2.7 \
+    mujoco-mjx==3.2.7 \
     scipy \
     cmake \
     inflection
@@ -133,7 +132,7 @@ RUN mkdir -p $MUJOCO_BUILD_DIR
 # RUN curl -sL https://github.com/google-deepmind/mujoco/releases/download/3.2.6/$MUJOCO_TAR_FILE | tar zx -C $MUJOCO_BUILD_DIR --strip-components=1
 
 ARG MUJOCO_EXT_DIR=$EXT_DIR/mujoco
-RUN git clone https://github.com/google-deepmind/mujoco.git --branch 3.2.6 $MUJOCO_EXT_DIR
+RUN git clone https://github.com/google-deepmind/mujoco.git --branch 3.2.7 $MUJOCO_EXT_DIR
 RUN mkdir -p $MUJOCO_BUILD_DIR; cd $MUJOCO_BUILD_DIR && cmake $MUJOCO_EXT_DIR -DCMAKE_INSTALL_PREFIX=$MUJOCO_BUILD_DIR -Wno-deprecated -Wno-dev && cmake --build . && cmake --install .
 
 RUN ln -sf $MUJOCO_BUILD_DIR/bin/simulate $BIN_DIR
@@ -156,17 +155,15 @@ RUN apt-get install -y \
 
 # Add PATH and PYTHONPATH
 ENV PATH=$PATH:$BIN_DIR
-# ENV PYTHONPATH=$USD_BUILD_DIR/lib/python:$MULTIVERSE_DIR/lib/dist-packages
+ENV PYTHONPATH=$USD_BUILD_DIR/lib/python:$MULTIVERSE_DIR/lib/dist-packages
 
 RUN echo "export PATH=$PATH" >> ~/.bashrc
 RUN echo "export PYTHONPATH=$PYTHONPATH" >> ~/.bashrc
-RUN echo "source /usr/local/bin/virtualenvwrapper.sh && workon multiverse" >> ~/.bashrc
+RUN echo "source $(which virtualenvwrapper.sh) && workon multiverse" >> ~/.bashrc
 
 # Copy packages
 COPY Multiverse /home/Multiverse
 WORKDIR /home/Multiverse
-
-RUN git submodule update --init $MULTIVERSE_DIR/modules/multiverse_knowledge
 
 # Build the software
 RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; ./build_multiverse.sh"

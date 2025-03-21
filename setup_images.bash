@@ -7,7 +7,7 @@ else
     (cd $MULTIVERSE_DIR; git pull)
 fi
 
-(cd $MULTIVERSE_DIR; git submodule update --init multiverse/resources; cd multiverse/resources; git submodule update --init)
+(cd $MULTIVERSE_DIR; git submodule update --init --depth 1 multiverse/resources; cd multiverse/resources; git submodule update --init)
 
 MULTIVERSE_TUTORIALS_DIR=$(dirname $0)/images/Multiverse-Tutorials-image/Multiverse-Tutorials
 if [ ! -d $MULTIVERSE_TUTORIALS_DIR ]; then

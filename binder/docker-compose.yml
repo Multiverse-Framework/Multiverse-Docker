@@ -1,10 +1,10 @@
 services:
   binderhub:
     tty: true
-    image: multiverseframework/binder:ubuntu-22.04
+    image: multiverseframework/multiverse-tutorials:ubuntu-20.04
     build:
       context: ../
-      dockerfile: ./binder/Dockerfile-22.04
+      dockerfile: ./binder/Dockerfile-20.04
     container_name: multiverse-binder-container
     command: jupyter lab --allow-root --NotebookApp.token='' --no-browser --ip=0.0.0.0
     ports:
