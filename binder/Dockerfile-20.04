@@ -58,7 +58,6 @@ RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; cmake
 # Copy necessary files
 COPY --chown=${NB_USER}:users binder /home/binder
 
-USER root
 # RUN apt update && rosdep install -y --ignore-src --from-paths /home/Multiverse/multiverse_ws2/src -r
 RUN chown -R ${NB_UID} /home/${NB_USER} && \
     chown ${NB_UID} /home/Multiverse
@@ -70,8 +69,7 @@ RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/
 COPY --chown=${NB_USER}:users binder/jupyter-settings.json /usr/local/share/jupyter/lab/settings/overrides.json
 
 RUN echo "export PYTHONPATH=$PYTHONPATH:$MULTIVERSE_DIR/lib/dist-packages" >> ~/.bashrc
-RUN echo "source $(which virtualenvwrapper.sh)" >> ~/.bashrc
-RUN echo "workon multiverse" >> ~/.bashrc
+RUN echo "source $(which virtualenvwrapper.sh) && workon multiverse" >> ~/.bashrc
 
 USER ${NB_USER}
 WORKDIR /home
