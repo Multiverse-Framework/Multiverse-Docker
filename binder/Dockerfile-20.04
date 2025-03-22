@@ -59,8 +59,7 @@ RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; cmake
 COPY --chown=${NB_USER}:users binder /home/binder
 
 # RUN apt update && rosdep install -y --ignore-src --from-paths /home/Multiverse/multiverse_ws2/src -r
-RUN chown -R ${NB_UID} /home/${NB_USER} && \
-    chown ${NB_UID} /home/Multiverse
+RUN chown -R ${NB_UID} /home/${NB_USER} && chown ${NB_UID} /home/Multiverse
 USER ${NB_USER}
 
 # Install OH-My-Bash
@@ -69,8 +68,7 @@ RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/
 COPY --chown=${NB_USER}:users binder/jupyter-settings.json /usr/local/share/jupyter/lab/settings/overrides.json
 
 RUN echo "export PYTHONPATH=$PYTHONPATH:$MULTIVERSE_DIR/lib/dist-packages" >> ~/.bashrc
-# RUN echo "source $(which virtualenvwrapper.sh) && workon multiverse" >> ~/.bashrc
+RUN echo "source $(which virtualenvwrapper.sh) && workon multiverse" >> ~/.bashrc
 
-USER ${NB_USER}
 WORKDIR /home
 ENTRYPOINT ["/home/binder/entrypoint.sh"]
