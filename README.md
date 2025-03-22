@@ -6,7 +6,7 @@ You can operate the Multiverse Framework with Docker in two ways: on the cloud o
 
 ## Run Multiverse Docker on the Cloud using BinderHub
 
-- [Link to the BinderHub](https://binder.intel4coro.de/v2/gh/Multiverse-Framework/Multiverse-Docker/ERF-2025-Ubuntu20.04)
+- [Link to the BinderHub](https://binder.intel4coro.de/v2/gh/Multiverse-Framework/Multiverse-Docker/ERF-2025-Ubuntu22.04)
 
 For the IROS2025 experiments, you can quickly access these Jupyter Notebooks:
 
