@@ -70,7 +70,8 @@ RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/
 COPY --chown=${NB_USER}:users binder/jupyter-settings.json /usr/local/share/jupyter/lab/settings/overrides.json
 
 RUN echo "export PYTHONPATH=$PYTHONPATH:$MULTIVERSE_DIR/lib/dist-packages" >> ~/.bashrc
-RUN echo "source $(which virtualenvwrapper.sh) && workon multiverse" >> ~/.bashrc
+RUN echo "source $(which virtualenvwrapper.sh)" >> ~/.bashrc
+RUN echo "workon multiverse" >> ~/.bashrc
 
 USER ${NB_USER}
 WORKDIR /home
