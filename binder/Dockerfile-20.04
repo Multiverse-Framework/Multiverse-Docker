@@ -22,7 +22,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - &&\
 
 # Install jupyterlab and related python packages
 RUN pip install pip --upgrade
-RUN pip install cython<3.0.0 wheel
+RUN pip install "cython<3.0.0" wheel
 RUN pip install pyyaml==5.4.1 --no-build-isolation
 RUN pip install --no-cache-dir --ignore-installed notebook==6.4.12 jupyterlab==3.6.5 \
     wstool pyOpenSSL==23.2.0 cryptography==38.0.4 \
