@@ -23,7 +23,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - &&\
 # Install jupyterlab and related python packages
 RUN pip install pip --upgrade
 RUN pip install --no-cache-dir --ignore-installed notebook==6.4.12 jupyterlab==3.6.5 \
-    wstool pyOpenSSL==23.2.0 pyyaml==5.3.1 cryptography==38.0.4 \
+    wstool pyOpenSSL==23.2.0 pyyaml==5.4.1 cryptography==38.0.4 \
     jupyter-resource-usage jupyter-offlinenotebook \
     jupyter-server-proxy jupyterlab-git jlab-enhanced-cell-toolbar \
     autobahn gnupg twisted cbor2 empy ipywidgets  \
