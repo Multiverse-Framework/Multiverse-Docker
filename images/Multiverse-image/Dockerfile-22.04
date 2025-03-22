@@ -63,22 +63,8 @@ ENV VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.10
 RUN python3.10 -m pip install virtualenvwrapper
 RUN /bin/bash -c "source $(which virtualenvwrapper.sh) && mkvirtualenv --system-site-packages multiverse -p python3.10"
 
-RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install --upgrade pip setuptools packaging distro
-RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install \
-    pyside6 \
-    pyopengl \
-    wheel \
-    cython \
-    owlready2 \
-    markupsafe==2.0.1 \
-    jinja2 \
-    pybind11 \
-    urdf_parser_py \
-    mujoco==3.2.7 \
-    mujoco-mjx==3.2.7 \
-    scipy \
-    cmake \
-    inflection
+# Install and upgrade additional packages for python
+RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install --upgrade pip build setuptools packaging cmake
 
 # Instal bash kernel
 RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install panel jupyter-server bash_kernel
@@ -103,7 +89,7 @@ ARG USD_EXT_DIR=$EXT_DIR/USD
 RUN mkdir -p $USD_BUILD_DIR
 
 RUN git clone https://github.com/PixarAnimationStudios/OpenUSD.git --branch v24.11 $USD_EXT_DIR
-RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; python3.10 $USD_EXT_DIR/build_scripts/build_usd.py $USD_BUILD_DIR"
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; python3.10 -m pip install pyside6 pyside6 pyopengl pybind11; python3.10 $USD_EXT_DIR/build_scripts/build_usd.py $USD_BUILD_DIR"
 RUN ln -sf $USD_BUILD_DIR/bin/usdview $BIN_DIR
 RUN ln -sf $USD_BUILD_DIR/bin/usdGenSchema $BIN_DIR
 RUN ln -sf $USD_BUILD_DIR/bin/usdcat $BIN_DIR
@@ -164,6 +150,9 @@ RUN echo "source $(which virtualenvwrapper.sh) && workon multiverse" >> ~/.bashr
 # Copy packages
 COPY Multiverse /home/Multiverse
 WORKDIR /home/Multiverse
+RUN git submodule update --init --depth 1 multiverse/modules/multiverse_parser
+RUN git submodule update --init --depth 1 multiverse/modules/multiverse_knowledge
+RUN git submodule update --init --depth 1 multiverse/modules/multiverse_connectors/src/multiverse_simulators/src/mujoco_connector
 
 # Build the software
 RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; ./build_multiverse.sh"

@@ -81,30 +81,14 @@ RUN apt-get install -y python3-rosdep && rosdep init && rosdep fix-permissions &
 # Install pip
 RUN apt-get install -y python3-pip && python3.8 -m pip install --upgrade pip build && python3.10 -m pip install --upgrade pip build
 
-# urdf_parser_py cannot be installed inside the virtualenv
-RUN pip install urdf_parser_py
-
 # Install virtualenvwrapper
 ENV VIRTUALENVWRAPPER_PYTHON=/opt/conda/bin/python
 RUN pip install virtualenvwrapper
 RUN /bin/bash -c "source $(which virtualenvwrapper.sh) && mkvirtualenv --system-site-packages multiverse3.8 -p python3.8"
 RUN /bin/bash -c "source $(which virtualenvwrapper.sh) && mkvirtualenv --system-site-packages multiverse -p python3.10"
 
-RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install \
-    pyside6 \
-    pyopengl \
-    wheel \
-    cython \
-    owlready2 \
-    markupsafe==2.0.1 \
-    jinja2 \
-    pybind11 \
-    mujoco==3.2.7 \
-    mujoco-mjx==3.2.7 \
-    scipy \
-    cmake \
-    inflection
-RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install --upgrade pip build setuptools packaging
+# Install and upgrade additional packages for python
+RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install --upgrade pip build setuptools packaging cmake
 
 # Instal bash kernel
 RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install panel jupyter-server bash_kernel
@@ -128,10 +112,10 @@ ARG USD_EXT_DIR=$EXT_DIR/USD
 
 RUN mkdir -p $USD_BUILD_DIR
 
-RUN conda install libpython-static
 RUN git clone https://github.com/PixarAnimationStudios/OpenUSD.git --branch v25.02 $USD_EXT_DIR
-RUN python3.8 -m pip install pyside6 pyopengl
-RUN /bin/bash -c "python3.8 $USD_EXT_DIR/build_scripts/build_usd.py $USD_BUILD_DIR --verbose"
+RUN conda install libpython-static
+RUN python3.8 -m pip install pyside6 pyside6 pyopengl pybind11
+RUN python3.8 $USD_EXT_DIR/build_scripts/build_usd.py $USD_BUILD_DIR --build-python-info /home/jovyan/.virtualenvs/multiverse3.8/bin/python3.8 /usr/include/python3.8 /usr/lib/x86_64-linux-gnu/libpython3.8.so 3.8 --verbose
 RUN ln -sf $USD_BUILD_DIR/bin/usdview $BIN_DIR
 RUN ln -sf $USD_BUILD_DIR/bin/usdGenSchema $BIN_DIR
 RUN ln -sf $USD_BUILD_DIR/bin/usdcat $BIN_DIR
@@ -209,9 +193,16 @@ RUN echo "source $(which virtualenvwrapper.sh) && workon multiverse" >> ~/.bashr
 # Copy packages
 COPY Multiverse /home/Multiverse
 WORKDIR /home/Multiverse
+RUN git submodule update --init --depth 1 multiverse/modules/multiverse_parser
+RUN git submodule update --init --depth 1 multiverse/modules/multiverse_knowledge
+RUN git submodule update --init --depth 1 multiverse/modules/multiverse_connectors/src/multiverse_simulators/src/mujoco_connector
+
+# Install the prerequisites
+RUN python3.10 -m pip install -r $MULTIVERSE_DIR/modules/multiverse_parser/requirements.txt
+RUN python3.10 -m pip install -r $MULTIVERSE_DIR/modules/multiverse_knowledge/requirements.txt
+RUN python3.10 -m pip install -r $MULTIVERSE_DIR/modules/multiverse_connectors/src/multiverse_simulators/src/mujoco_connector/requirements.txt
 
 # Build the software
-
 RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; ./build_multiverse.sh"
 
 # Build the ROS workspace
