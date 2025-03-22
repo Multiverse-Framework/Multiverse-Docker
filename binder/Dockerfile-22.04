@@ -1,4 +1,4 @@
-FROM multiverseframework/multiverse-tutorials:ubuntu-20.04@sha256:756da92fb24da592f7c15ab410f924c4c515e3e511fc5636a9446a36ff09ea7d
+FROM multiverseframework/multiverse-tutorials:ubuntu-22.04@sha256:b86fb7623b9dfab4fc85ed47c9152574f1dddeaec1a9c94e8379fa2e4596dbe9
 
 USER root
 ENV SHELL=/bin/bash
@@ -22,8 +22,10 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - &&\
 
 # Install jupyterlab and related python packages
 RUN pip install pip --upgrade
+RUN pip install "cython<3.0.0" wheel
+RUN pip install pyyaml==5.4.1 --no-build-isolation
 RUN pip install --no-cache-dir --ignore-installed notebook==6.4.12 jupyterlab==3.6.5 \
-    wstool pyOpenSSL==23.2.0 pyyaml==5.3.1 cryptography==38.0.4 \
+    wstool pyOpenSSL==23.2.0 cryptography==38.0.4 \
     jupyter-resource-usage jupyter-offlinenotebook \
     jupyter-server-proxy jupyterlab-git jlab-enhanced-cell-toolbar \
     autobahn gnupg twisted cbor2 empy ipywidgets  \
@@ -33,9 +35,7 @@ RUN pip install --no-cache-dir --ignore-installed notebook==6.4.12 jupyterlab==3
 
 # Allow user ${NB_USER} write some directories
 RUN chown -R ${NB_UID} /tmp
-RUN chown -R ${NB_UID} /home/Multiverse/multiverse/modules/multiverse_knowledge/Konclude
-RUN chown -R ${NB_UID} /home/Multiverse/multiverse/modules/multiverse_knowledge/ease_lexical_resources
-RUN chown -R ${NB_UID} /home/Multiverse/multiverse/modules/multiverse_connectors/scripts/utils/config
+RUN chown -R ${NB_UID} /home/Multiverse/multiverse/modules
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse/resources
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse/saved
 RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws2
@@ -47,18 +47,17 @@ RUN chown -R ${NB_UID} /home/Multiverse-Tutorials/src
 ARG MULTIVERSE_DIR=/home/Multiverse/multiverse
 ARG BUILD_DIR=$MULTIVERSE_DIR/build
 RUN /bin/bash -c "source $(which virtualenvwrapper.sh); mkvirtualenv --system-site-packages multiverse"
-RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; pip install pyside6 pyopengl pyside6 wheel cython owlready2 markupsafe==2.0.1 jinja2 pybind11 urdf_parser_py mujoco==3.2.7 mujoco-mjx==3.2.7 scipy panel jupyter-server bash_kernel; python -m bash_kernel.install"
-RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; cmake -S $MULTIVERSE_DIR -B $BUILD_DIR -DCMAKE_INSTALL_PREFIX:PATH=$MULTIVERSE_DIR -DMULTIVERSE_CLIENT_LIBRARY_TYPE=STATIC -DSTDLIB=libstdc++"
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; pip install psutil==5.9.2 pyside6 pyopengl pyside6 wheel cython owlready2 markupsafe==2.0.1 jinja2 pybind11 urdf_parser_py mujoco==3.2.7 mujoco-mjx==3.2.7 scipy panel"
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; cmake -S $MULTIVERSE_DIR -B $BUILD_DIR -DCMAKE_INSTALL_PREFIX:PATH=$MULTIVERSE_DIR -DMULTIVERSE_CLIENT_LIBRARY_TYPE=STATIC -DSTDLIB=libstdc++ -DBUILD_SRC=ON -DBUILD_MODULES=OFF -DBUILD_CONNECTORS=OFF -DBUILD_KNOWLEDGE=OFF -DBUILD_PARSER=OFF -DBUILD_TESTS=OFF"
+RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; cmake -S $MULTIVERSE_DIR -B $BUILD_DIR -DCMAKE_INSTALL_PREFIX:PATH=$MULTIVERSE_DIR -DMULTIVERSE_CLIENT_LIBRARY_TYPE=STATIC -DSTDLIB=libstdc++ -DBUILD_MODULES=ON -DBUILD_CONNECTORS=ON -DBUILD_KNOWLEDGE=OFF -DBUILD_PARSER=OFF -DBUILD_TESTS=OFF"
 RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; make -C $BUILD_DIR"
 RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; cmake --install $BUILD_DIR"
 
 # Copy necessary files
 COPY --chown=${NB_USER}:users binder /home/binder
 
-USER root
 # RUN apt update && rosdep install -y --ignore-src --from-paths /home/Multiverse/multiverse_ws2/src -r
-RUN chown -R ${NB_UID} /home/${NB_USER} && \
-    chown ${NB_UID} /home/Multiverse
+RUN chown -R ${NB_UID} /home/${NB_USER} && chown ${NB_UID} /home/Multiverse
 USER ${NB_USER}
 
 # Install OH-My-Bash
@@ -69,6 +68,5 @@ COPY --chown=${NB_USER}:users binder/jupyter-settings.json /usr/local/share/jupy
 RUN echo "export PYTHONPATH=$PYTHONPATH:$MULTIVERSE_DIR/lib/dist-packages" >> ~/.bashrc
 RUN echo "source $(which virtualenvwrapper.sh) && workon multiverse" >> ~/.bashrc
 
-USER ${NB_USER}
 WORKDIR /home
 ENTRYPOINT ["/home/binder/entrypoint.sh"]
