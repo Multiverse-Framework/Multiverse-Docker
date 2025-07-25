@@ -34,29 +34,12 @@ RUN pip install --no-cache-dir --ignore-installed notebook==6.4.12 jupyterlab==3
     empy==3.3.4
 
 # Allow user ${NB_USER} write some directories
-RUN chown -R ${NB_UID} /tmp
-RUN chown -R ${NB_UID} /home/Multiverse/multiverse/modules
-RUN chown -R ${NB_UID} /home/Multiverse/multiverse/resources
-RUN chown -R ${NB_UID} /home/Multiverse/multiverse/saved
-RUN chown -R ${NB_UID} /home/Multiverse/multiverse_ws2
-RUN chown -R ${NB_UID} /home/Multiverse-Tutorials/resources
-RUN chown -R ${NB_UID} /home/Multiverse-Tutorials/output
-RUN chown -R ${NB_UID} /home/Multiverse-Tutorials/tutorials/multiverse_client
-RUN chown -R ${NB_UID} /home/Multiverse-Tutorials/src
-
-ARG MULTIVERSE_DIR=/home/Multiverse/multiverse
-ARG BUILD_DIR=$MULTIVERSE_DIR/build
-RUN /bin/bash -c "source $(which virtualenvwrapper.sh); mkvirtualenv --system-site-packages multiverse"
-RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; pip install psutil==5.9.2 pyside6 pyopengl pyside6 wheel cython owlready2 markupsafe==2.0.1 jinja2 pybind11 urdf_parser_py mujoco==3.2.7 mujoco-mjx==3.2.7 scipy panel"
-RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; cmake -S $MULTIVERSE_DIR -B $BUILD_DIR -DCMAKE_INSTALL_PREFIX:PATH=$MULTIVERSE_DIR -DMULTIVERSE_CLIENT_LIBRARY_TYPE=STATIC -DSTDLIB=libstdc++ -DBUILD_SRC=ON -DBUILD_MODULES=OFF -DBUILD_CONNECTORS=OFF -DBUILD_KNOWLEDGE=OFF -DBUILD_PARSER=OFF -DBUILD_TESTS=OFF"
-RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; cmake -S $MULTIVERSE_DIR -B $BUILD_DIR -DCMAKE_INSTALL_PREFIX:PATH=$MULTIVERSE_DIR -DMULTIVERSE_CLIENT_LIBRARY_TYPE=STATIC -DSTDLIB=libstdc++ -DBUILD_MODULES=ON -DBUILD_CONNECTORS=ON -DBUILD_KNOWLEDGE=OFF -DBUILD_PARSER=OFF -DBUILD_TESTS=OFF"
-RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; make -C $BUILD_DIR"
-RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; cmake --install $BUILD_DIR"
+RUN chown -R ${NB_UID} /home/Multiverse
+RUN chown -R ${NB_UID} /home/Multiverse-Tutorials
 
 # Copy necessary files
 COPY --chown=${NB_USER}:users binder /home/binder
 
-# RUN apt update && rosdep install -y --ignore-src --from-paths /home/Multiverse/multiverse_ws2/src -r
 RUN chown -R ${NB_UID} /home/${NB_USER} && chown ${NB_UID} /home/Multiverse
 USER ${NB_USER}
 
@@ -64,9 +47,6 @@ USER ${NB_USER}
 RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)" --unattended && \
     sed -i 's/OSH_THEME="font"/OSH_THEME="half-life"/' /home/${NB_USER}/.bashrc
 COPY --chown=${NB_USER}:users binder/jupyter-settings.json /usr/local/share/jupyter/lab/settings/overrides.json
-
-RUN echo "export PYTHONPATH=$PYTHONPATH:$MULTIVERSE_DIR/lib/dist-packages" >> ~/.bashrc
-RUN echo "source $(which virtualenvwrapper.sh) && workon multiverse" >> ~/.bashrc
 
 WORKDIR /home
 ENTRYPOINT ["/home/binder/entrypoint.sh"]
