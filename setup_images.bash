@@ -7,11 +7,11 @@ else
     (cd $MULTIVERSE_DIR; git pull)
 fi
 
-(cd $MULTIVERSE_DIR; git submodule update --init --depth 1 multiverse/resources; cd multiverse/resources; git submodule update --init)
+(cd $MULTIVERSE_DIR; git submodule update --init --recursive --depth 1)
 
-MULTIVERSE_TUTORIALS_DIR=$(dirname $0)/images/Multiverse-Tutorials-image/Multiverse-Tutorials
-if [ ! -d $MULTIVERSE_TUTORIALS_DIR ]; then
-    git clone https://github.com/Multiverse-Framework/Multiverse-Tutorials $MULTIVERSE_TUTORIALS_DIR --depth 1
-else
-    (cd $MULTIVERSE_TUTORIALS_DIR; git pull)
-fi
+# MULTIVERSE_TUTORIALS_DIR=$(dirname $0)/images/Multiverse-Tutorials-image/Multiverse-Tutorials
+# if [ ! -d $MULTIVERSE_TUTORIALS_DIR ]; then
+#     git clone https://github.com/Multiverse-Framework/Multiverse-Tutorials $MULTIVERSE_TUTORIALS_DIR --depth 1
+# else
+#     (cd $MULTIVERSE_TUTORIALS_DIR; git pull)
+# fi
