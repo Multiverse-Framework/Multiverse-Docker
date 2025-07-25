@@ -20,111 +20,6 @@ RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/r
 RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
 RUN apt-get update && apt-get install -y ros-humble-desktop ros-dev-tools
 
-# Install prerequisites
-RUN apt-get update && apt-get install -y \
-    python-is-python3 \
-    libglfw3 \
-    libzmq3-dev \
-    libgl1-mesa-dev \
-    libglu1-mesa-dev \
-    libxt-dev \
-    git \
-    git-lfs \
-    libjsoncpp-dev \
-    build-essential \
-    subversion \
-    cmake \
-    libx11-dev \
-    libxxf86vm-dev \
-    libxcursor-dev \
-    libxi-dev \
-    libxrandr-dev \
-    libxinerama-dev \
-    libegl-dev \
-    libwayland-dev \
-    wayland-protocols \
-    libxkbcommon-dev \
-    libdbus-1-dev \
-    linux-libc-dev \
-    libxcb-cursor0 \
-    pybind11-dev
-
-# Install compilers
-RUN apt-get install -y clang-14 llvm-14-dev libc++-14-dev libc++abi-14-dev libstdc++-12-dev 
-
-# Install rosdep
-RUN apt-get install -y python3-rosdep && rosdep init && rosdep fix-permissions && rosdep update
-
-# Install pip
-RUN apt-get install -y python3-pip && python3 -m pip install --upgrade pip build
-
-# Install virtualenvwrapper
-ENV VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.10
-RUN python3.10 -m pip install virtualenvwrapper
-RUN /bin/bash -c "source $(which virtualenvwrapper.sh) && mkvirtualenv --system-site-packages multiverse -p python3.10"
-
-# Install and upgrade additional packages for python
-RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install --upgrade pip build setuptools packaging cmake
-
-# Instal bash kernel
-RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install panel jupyter-server bash_kernel
-RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m bash_kernel.install
-
-# Prepare the environment
-
-ARG MULTIVERSE_DIR=/home/Multiverse/multiverse
-ARG BIN_DIR=$MULTIVERSE_DIR/bin
-ARG EXT_DIR=$MULTIVERSE_DIR/external
-ARG BUILD_DIR=$MULTIVERSE_DIR/build
-ARG SRC_DIR=$MULTIVERSE_DIR/src
-ARG LIB_DIR=$MULTIVERSE_DIR/lib
-
-RUN mkdir -p $BIN_DIR
-RUN mkdir -p $BUILD_DIR
-
-# Build USD
-ARG USD_BUILD_DIR=$BUILD_DIR/USD
-ARG USD_EXT_DIR=$EXT_DIR/USD
-
-RUN mkdir -p $USD_BUILD_DIR
-
-RUN git clone https://github.com/PixarAnimationStudios/OpenUSD.git --branch v24.11 $USD_EXT_DIR
-RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; python3.10 -m pip install pyside6 pyside6 pyopengl pybind11; python3.10 $USD_EXT_DIR/build_scripts/build_usd.py $USD_BUILD_DIR"
-RUN ln -sf $USD_BUILD_DIR/bin/usdview $BIN_DIR
-RUN ln -sf $USD_BUILD_DIR/bin/usdGenSchema $BIN_DIR
-RUN ln -sf $USD_BUILD_DIR/bin/usdcat $BIN_DIR
-
-# Build blender
-ARG BLENDER_BUILD_DIR=$BUILD_DIR/blender
-RUN mkdir -p $BLENDER_BUILD_DIR
-
-ARG BLENDER_TAR_FILE=blender-4.2.0-linux-x64.tar.xz
-RUN curl -o $EXT_DIR/$BLENDER_TAR_FILE https://download.blender.org/release/Blender4.2/$BLENDER_TAR_FILE; tar xf $EXT_DIR/$BLENDER_TAR_FILE -C $BLENDER_BUILD_DIR --strip-components=1
-RUN cd $BLENDER_BUILD_DIR/4.2/python/bin && ./python3.11 -m pip install --upgrade pip build --no-warn-script-location && ./python3.11 -m pip install bpy Pillow --no-warn-script-location
-
-# ARG BLENDER_EXT_DIR=$EXT_DIR/blender-git
-# RUN cd $BLENDER_EXT_DIR/blender && ./build_files/utils/make_update.py --use-linux-libraries
-# RUN cd $BLENDER_BUILD_DIR && cmake -S ../../external/blender-git/blender -B . -Wno-deprecated -Wno-dev && make -j$(nproc) && make install
-# RUN cd $BLENDER_BUILD_DIR/bin/4.2/python/bin && ./python3.11 -m pip install --upgrade pip build --no-warn-script-location && ./python3.11 -m pip install bpy Pillow --no-warn-script-location
-
-RUN ln -sf $BLENDER_BUILD_DIR/blender $BIN_DIR
-RUN ln -sf $BLENDER_BUILD_DIR/4.2/python/bin/python3.11 $BIN_DIR
-
-# Build MuJoCo
-ARG MUJOCO_BUILD_DIR=$BUILD_DIR/mujoco
-RUN mkdir -p $MUJOCO_BUILD_DIR
-
-# ARG MUJOCO_TAR_FILE=mujoco-3.2.6-linux-x86_64.tar.gz
-# RUN curl -sL https://github.com/google-deepmind/mujoco/releases/download/3.2.6/$MUJOCO_TAR_FILE | tar zx -C $MUJOCO_BUILD_DIR --strip-components=1
-
-ARG MUJOCO_EXT_DIR=$EXT_DIR/mujoco
-RUN git clone https://github.com/google-deepmind/mujoco.git --branch 3.2.7 $MUJOCO_EXT_DIR
-RUN mkdir -p $MUJOCO_BUILD_DIR; cd $MUJOCO_BUILD_DIR && cmake $MUJOCO_EXT_DIR -DCMAKE_INSTALL_PREFIX=$MUJOCO_BUILD_DIR -Wno-deprecated -Wno-dev && cmake --build . && cmake --install .
-
-RUN ln -sf $MUJOCO_BUILD_DIR/bin/simulate $BIN_DIR
-
-RUN apt-get update && apt-get upgrade -y
-
 # Install additional packages for ROS2
 RUN apt-get install -y \
     ros-humble-xacro \
@@ -137,28 +32,36 @@ RUN apt-get install -y \
     ros-humble-position-controllers \
     ros-humble-velocity-controllers \
     ros-humble-effort-controllers \
-    ros-humble-gripper-controllers
+    ros-humble-gripper-controllers \
+    ros-humble-controller-manager
 
-# Add PATH and PYTHONPATH
-ENV PATH=$PATH:$BIN_DIR
-ENV PYTHONPATH=$USD_BUILD_DIR/lib/python:$MULTIVERSE_DIR/lib/dist-packages
+RUN useradd -m --uid 7593 multiverse
+RUN conda create -y --name multiverse python=3.10
+RUN chown -R multiverse /opt/conda
+RUN chown -R multiverse /home/jovyan
+SHELL ["/bin/bash", "-c"]
+RUN echo "export PATH=$PATH:/home/jovyan/.local/bin" >> ~/.bashrc
+RUN echo "conda activate multiverse" >> ~/.bashrc
 
-RUN echo "export PATH=$PATH" >> ~/.bashrc
-RUN echo "export PYTHONPATH=$PYTHONPATH" >> ~/.bashrc
-RUN echo "source $(which virtualenvwrapper.sh) && workon multiverse" >> ~/.bashrc
-
-# Copy packages
 COPY Multiverse /home/Multiverse
+RUN chown -R multiverse /home/Multiverse
+
+USER multiverse
 WORKDIR /home/Multiverse
-RUN git submodule update --init --depth 1 multiverse/modules/multiverse_parser
-RUN git submodule update --init --depth 1 multiverse/modules/multiverse_knowledge
-RUN git submodule update --init --depth 1 multiverse/modules/multiverse_connectors/src/multiverse_simulators/src/mujoco_connector
 
-# Build the software
-RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; ./build_multiverse.sh"
-
-# Build the ROS workspace
-RUN /bin/bash -c "source $(which virtualenvwrapper.sh); workon multiverse; ./build_multiverse_ws2.sh"
+RUN conda run -n multiverse pip install -U pip build setuptools
+RUN conda run -n multiverse pip install -r /home/Multiverse/Multiverse-Launch/requirements.txt
+RUN conda run -n multiverse pip install -r /home/Multiverse/Multiverse-Launch/src/multiverse_connectors/multiverse_simulators_connector/src/mujoco_connector/requirements.txt
+RUN conda run -n multiverse pip install -r /home/Multiverse/Multiverse-Launch/src/multiverse_connectors/multiverse_ros_connector/requirements.txt
+RUN conda run -n multiverse pip install -r /home/Multiverse/Multiverse-Utilities/requirements.txt
+RUN conda run -n multiverse pip install -r /home/Multiverse/Multiverse-Parser/requirements.txt
+RUN (cd Multiverse-Parser; conda run -n multiverse pip install pyside6 pyopengl jinja2; PYTHON_EXECUTABLE=/opt/conda/envs/multiverse/bin/python3 ./setup.sh; conda run -n multiverse pip install -e .)
+RUN conda run -n multiverse pip install -r /home/Multiverse/Multiverse-Knowledge/requirements.txt
+RUN bash -c "source /opt/conda/etc/profile.d/conda.sh && \
+             conda activate multiverse && \
+             source /opt/ros/humble/setup.bash && \
+             cd Multiverse-Launch/src/multiverse_connectors/multiverse_ros_connector/ros_ws/multiverse_ws2 && \
+             colcon build --symlink-install"
 
 # --- Install VNC server and XFCE desktop environment --- #
 USER root

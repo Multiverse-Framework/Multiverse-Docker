@@ -1,13 +1,16 @@
 FROM multiverseframework/multiverse:ubuntu-22.04
 
 RUN mkdir -p /home/Multiverse-Tutorials/src
-# RUN cd /home/Multiverse-Tutorials/src; git clone https://github.com/allenai/ai2thor.git --depth 1
-RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m ipykernel install --user --name multiverse --display-name "multiverse"
-RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install -U /home/Multiverse/multiverse/build/modules/multiverse_parser/multiverse_parser-0.0.1.tar.gz
-RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install prior ipywidgets solara
-RUN pip install ipywidgets solara widgetsnbextension
-RUN conda install -c conda-forge jupyter_contrib_nbextensions
-RUN jupyter nbextension enable --py widgetsnbextension
+RUN cd /home/Multiverse-Tutorials/src; git clone https://github.com/allenai/ai2thor.git --depth 1
+
 COPY Multiverse-Tutorials /home/Multiverse-Tutorials
+RUN cd /home/Multiverse-Tutorials/src; python3 get_meshes.py; /home/Multiverse/Multiverse-Parser/ext/blender/4.4/python/bin/python3.11 extract_objects.py
+
+RUN conda run -n multiverse pip install ipykernel prior ipywidgets solara
+RUN conda run -n multiverse python -m ipykernel install --user --name multiverse --display-name "multiverse"
+
+RUN pip install -e /home/Multiverse/Multiverse-Parser
+RUN pip install -r /home/Multiverse-Tutorials/requirements.txt
+RUN conda install -c conda-forge jupyter_contrib_nbextensions; jupyter nbextension enable --py widgetsnbextension
 
 WORKDIR /home/Multiverse-Tutorials

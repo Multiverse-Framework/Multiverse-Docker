@@ -1,4 +1,4 @@
-FROM multiverseframework/multiverse-tutorials:ubuntu-22.04@sha256:b86fb7623b9dfab4fc85ed47c9152574f1dddeaec1a9c94e8379fa2e4596dbe9
+FROM multiverseframework/multiverse-tutorials:ubuntu-22.04@sha256:87711211953c8ca907edeb4537ec558461aa6898d12acb1cddee4a876f44c00e
 
 USER root
 ENV SHELL=/bin/bash

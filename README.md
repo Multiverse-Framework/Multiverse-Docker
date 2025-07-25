@@ -10,7 +10,7 @@ You can operate the Multiverse Framework with Docker in two ways: on the cloud o
 
 For the IROS2025 experiments, you can quickly access these Jupyter Notebooks:
 
-- [Universal Scene Description Parser Experiment (for URDF, MJCF and USDA as input)](https://binder.intel4coro.de/v2/gh/Multiverse-Framework/Multiverse-Docker/ICRA-2025?urlpath=lab%2Ftree%2FMultiverse-Tutorials%2Ftutorials%2Fmultiverse_parser_quick_start.ipynb)
+- [Universal Scene Description Parser Experiment (for URDF, MJCF and USDA as input)](https://binder.intel4coro.de/v2/gh/Multiverse-Framework/Multiverse-Docker/IROS-2025?urlpath=lab%2Ftree%2FMultiverse-Tutorials%2Ftutorials%2Fmultiverse_parser_quick_start.ipynb)
 - [Universal Scene Description Parser Experiment (for ProcTHOR as input)](https://binder.intel4coro.de/v2/gh/Multiverse-Framework/Multiverse-Docker/ICRA-2025?urlpath=lab%2Ftree%2FMultiverse-Tutorials%2Ftutorials%2Fmultiverse_knowledge_quick_start.ipynb)
 - [Competency Questions Experiment](https://binder.intel4coro.de/v2/gh/sasjonge/semantic-map-lab.git/dfl_reasoner?labpath=notebooks%2Fsemantic_map.ipynb)
 
@@ -24,9 +24,9 @@ Verify your versions of `docker` and `docker compose` by running:
 
 ```bash
 $ docker -v
-Docker version 27.1.2, build d01f264
+Docker version 28.3.2, build 578ccf6
 $ docker compose version
-Docker Compose version v2.29.1
+Docker Compose version v2.38.2
 ```
 
 ### 1. Set up Docker

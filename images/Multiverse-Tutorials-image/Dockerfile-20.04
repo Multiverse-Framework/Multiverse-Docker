@@ -2,12 +2,13 @@ FROM multiverseframework/multiverse:ubuntu-20.04
 
 RUN mkdir -p /home/Multiverse-Tutorials/src
 RUN cd /home/Multiverse-Tutorials/src; git clone https://github.com/allenai/ai2thor.git --depth 1
-RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m ipykernel install --user --name multiverse --display-name "multiverse"
-RUN /home/jovyan/.virtualenvs/multiverse/bin/python3.10 -m pip install prior ipywidgets solara
-RUN pip install rospkg ipywidgets solara widgetsnbextension
-RUN jupyter nbextension enable --py widgetsnbextension
+
+RUN conda run -n multiverse pip install ipykernel prior ipywidgets solara
+RUN conda run -n multiverse python -m ipykernel install --user --name multiverse --display-name "multiverse"
+RUN pip install solara widgetsnbextension prior; jupyter nbextension enable --py widgetsnbextension
 
 COPY Multiverse-Tutorials /home/Multiverse-Tutorials
-RUN cd /home/Multiverse-Tutorials/src; python get_meshes.py; python3.11 extract_objects.py
+RUN cd /home/Multiverse-Tutorials/src; python3 get_meshes.py; /home/Multiverse/Multiverse-Parser/ext/blender/4.4/python/bin/python3.11 extract_objects.py
+RUN cd /home/Multiverse/Multiverse-Parser; conda run -n multiverse pip install -e .
 
 WORKDIR /home/Multiverse-Tutorials
