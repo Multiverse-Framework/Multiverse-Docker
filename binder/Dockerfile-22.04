@@ -27,7 +27,7 @@ RUN pip install --upgrade pip && \
         https://raw.githubusercontent.com/yxzhan/jupyterlab-rviz/master/dist/jupyterlab_rviz-0.3.1.tar.gz
 
 # Set permissions
-RUN chown -R ${NB_UID} /home/Multiverse /home/Multiverse-Tutorials
+RUN chown -R ${NB_UID} /home/Multiverse /home/Multiverse-Tutorials /opt/conda
 
 # Copy binder and fix ownership
 COPY --chown=${NB_USER}:users binder /home/binder
