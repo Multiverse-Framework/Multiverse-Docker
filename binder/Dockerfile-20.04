@@ -1,4 +1,4 @@
-FROM multiverseframework/multiverse-tutorials:ubuntu-20.04@sha256:2cdf9a11c12062bb025d47e3faef5e0c641116c37d22def353c5d4128680107a
+FROM multiverseframework/multiverse-tutorials:ubuntu-20.04@sha256:ef02aa76e6741be39de1a29e4a889cc4e8136e70e25a547fff8783b7b4d6791e
 
 ENV SHELL=/bin/bash \
     NB_USER=jovyan \
